@@ -1,0 +1,11 @@
+program test;
+variables 
+    x, y, resultado : int; 
+
+
+principal() {
+    x = 5;
+    y = 6;
+    
+    resultado = x + 5;
+}

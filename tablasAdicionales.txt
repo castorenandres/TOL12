@@ -1,0 +1,17 @@
+Codigo numerico para operadores
+1 -> +
+2 -> -
+3 -> *
+4 -> /
+5 -> ==
+6 -> !=
+7 -> >
+8 -> <
+9 -> &
+10 -> |
+
+
+Codigo de tipos
+1 -> int
+2 -> float
+3 -> void

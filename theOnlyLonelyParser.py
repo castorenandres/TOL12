@@ -6,10 +6,84 @@ from funcAndVarTable import VarTable
 
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
+    funcTypeTemp = 0
+    quadCount = 1
+    scope = 0
+    quadruples = {}
     idStack = deque()
     sizeStack = deque()
-    funcTypeTemp = 0
-    # funcTableID = 0
+    poper = deque()
+    pilaO = deque()
+    pTypes = deque()
+
+    # siguiendo el codigo para tipos: int -> 1, float -> 2
+    # siguiendo el codigo para operadores : 
+        # 1 -> +
+        # 2 -> -
+        # 3 -> *
+        # 4 -> /
+        # 5 -> ==
+        # 6 -> !=
+        # 7 -> >
+        # 8 -> <
+        # 9 -> &
+        # 10 -> |
+    # cuando no se puede hacer la operacion se tiene un -1
+    semCube = {
+        1: {
+            1: {
+                1: 1,
+                2: 1,
+                3: 1,
+                4: 1,
+                5: 1,
+                6: 1,
+                7: 1,
+                8: 1,
+                9: 1,
+                10: 1
+            },
+            2: {
+                1: 2,
+                2: 2,
+                3: 2,
+                4: 2,
+                5: 1,
+                6: 1,
+                7: 1,
+                8: 1,
+                9: -1,
+                10: -1
+            }
+        },
+        2: {
+            1: {
+                1: 2,
+                2: 2,
+                3: 2,
+                4: 2,
+                5: 1,
+                6: 1,
+                7: 1,
+                8: 1,
+                9: -1,
+                10: -1
+            },
+            2: {
+                1: 2,
+                2: 2,
+                3: 2,
+                4: 2,
+                5: 1,
+                6: 1,
+                7: 1,
+                8: 1,
+                9: -1,
+                10: -1
+            }
+        }
+    }
+    
 
     # Grammar rules
 
@@ -18,8 +92,7 @@ class TheOnlyLonelyParser(Parser):
         print("entra programa")
         print("ids: " + str(len(self.idStack)))
         print("size: " + str(len(self.sizeStack)))
-        for x in range(len(self.sizeStack)):
-            print(self.sizeStack.pop())
+        print(functTable.show())
         pass
 
     @_('ID')
@@ -27,18 +100,18 @@ class TheOnlyLonelyParser(Parser):
         print("entra programa4")
         functTable.addFunc(p.ID, 3)
         print("func table: ")
-        functTable.show(0)
-        pass
+        functTable.show()
+        return p
 
     @_('vars', '')
     def programa2(self, p):
         print("entra programa2")
-        pass
+        return p
 
     @_('func', '')
     def programa3(self, p):
         print("entra programa3")
-        pass
+        return p
 
     @_('func2 FUNCTION func5 "(" parametro ")" ";" func3 bloque func4')
     def func(self, p):
@@ -50,7 +123,7 @@ class TheOnlyLonelyParser(Parser):
         # print(funcTable)
         print("entra func")
         
-        pass
+        return p
 
     @_('ID')
     def func5(self, p):
@@ -70,17 +143,17 @@ class TheOnlyLonelyParser(Parser):
                 self.funcTypeTemp = 2
             
         print("func type: ", self.funcTypeTemp)
-        pass
+        return p
 
     @_('vars', '')
     def func3(self, p):
         print("entra func3")
-        pass
+        return p
 
     @_('func', '')
     def func4(self, p):
         print("entra func4")
-        pass
+        return p
 
     @_('VARIABLES vars2')
     def vars(self, p):
@@ -88,14 +161,14 @@ class TheOnlyLonelyParser(Parser):
         # varTable.addVar("x", 1, 0, 4)
         # varTable.show(0)
         print("entra vars")
-        pass
+        return p
 
     @_('vars3 ":" vars5 ";" vars6')
     def vars2(self, p):
         print("entra vars2")
         print(p.vars3)
         
-        pass
+        return p
 
     @_('ID "[" CTEI "]" vars4', 'ID vars4')
     def vars3(self, p):
@@ -114,7 +187,7 @@ class TheOnlyLonelyParser(Parser):
     @_('"," vars3', '')
     def vars4(self, p):
         print("entra vars4")
-        pass
+        return p
 
     @_('tiposimple')
     def vars5(self, p):
@@ -122,41 +195,41 @@ class TheOnlyLonelyParser(Parser):
         print("Tiposimple: ")
         if p.tiposimple[1] == 'int':
             for x in range(len(self.idStack)):
-                varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), None)
+                varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop())
                 # print(self.idStack.pop(), 'int', self.sizeStack.pop())
         elif p.tiposimple[1] == 'float':
             for x in range(len(self.idStack)):
-                varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop(), None)
+                varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop())
                 # print(self.idStack.pop(), 'float', self.sizeStack.pop())
-        functTable.show(0)
+        functTable.show()
         print(p.tiposimple)
         return p
 
     @_('vars2', '')
     def vars6(self, p):
         print("entra vars6")
-        pass
+        return p
 
     @_('PRINCIPAL "(" ")" bloque')
     def principal(self, p):
         print("entra principal")
-        pass
+        return p
 
     @_('tiposimple ID parametro2')
     def parametro(self, p):
         print("entra parametro")
 
         if p.tiposimple[1] == 'int':
-            varTable.addVar(p.ID, 1, 0, None)
+            varTable.addVar(p.ID, 1, 0)
         elif p.tiposimple[1] == 'float':
-            varTable.addVar(p.ID, 2, 0, None)
+            varTable.addVar(p.ID, 2, 0)
 
-        pass
+        return p
 
     @_('"," parametro', '')
     def parametro2(self, p):
         print("entra parametro2")
-        pass
+        return p
 
     @_('INT', 'FLOAT')
     def tiposimple(self, p):
@@ -166,287 +239,334 @@ class TheOnlyLonelyParser(Parser):
     @_('"{" bloque2 "}"')
     def bloque(self, p):
         print("entra bloque")
-        pass
+        return p
 
     @_('estatuto bloque2', '')
     def bloque2(self, p):
         print("entra bloque2")
-        pass
+        return p
 
     @_('asignacion', 'llamada', 'retorno', 'lectura', 'escritura', 'condicion', 'ciclow', 'ciclof', 'funcEspecial')
     def estatuto(self, p):
         print("entra estatuto")
-        pass
+        return p
 
     @_('ID varibale2')
     def variable(self, p):
         print("entra variable")
-        pass
+        return p
 
     @_('"[" expresion "]"', '')
     def varibale2(self, p):
         print("entra variable2")
-        pass
+        return p
 
-    @_('variable ASSIGN expresion ";"')
+    @_('asignacion2 asignacion3 expresion ";"')
     def asignacion(self, p):
         print("entra asignacion")
-        pass
+        return p
+
+    @_('variable')
+    def asignacion2(self, p):
+        print("entra asignacion2")
+        return p
+
+    @_('ASSIGN')
+    def asignacion3(self, p):
+        print("entra asignacion3")
+        return p
 
     @_('ID "(" expresion llamada2 ")" ";"')
     def llamada(self, p):
         print("entra llamada")
-        pass
+        return p
 
     @_('"," expresion llamada2', '')
     def llamada2(self, p):
         print("entra llamada2")
-        pass
+        return p
 
     @_('RETURN "(" expresion ")" ";"')
     def retorno(self, p):
         print("entra retorno")
-        pass
+        return p
 
     @_('READ "(" variable ")" ";"')
     def lectura(self, p):
         print("entra lectura")
-        pass
+        return p
 
     @_('WRITE "(" escritura2 ")" ";"')
     def escritura(self, p):
         print("entra escritura")
-        pass
+        return p
 
     @_('expresion', 'CTESTRING')
     def escritura2(self, p):
         print("entra escritura2")
-        pass
+        return p
 
-    @_('IF "(" expresion ")" THEN bloque condicion2')
+    @_('IF condicion2 THEN bloque condicion3')
     def condicion(self, p):
         print("entra condicion")
-        pass
+        return p
 
-    @_('ELSE bloque', '')
+    @_('"(" expresion ")"')
     def condicion2(self, p):
         print("entra condicion2")
-        pass
+        return p
 
-    @_('WHILE "(" expresion ")" DO bloque')
+    @_('condicion4 bloque', '')
+    def condicion3(self, p):
+        print("entra condicion3")
+        return p
+
+    @_('ELSE')
+    def condicion4(self, p):
+        print("entra condicion4")
+        return p
+
+    @_('ciclow2 ciclow3 DO bloque')
     def ciclow(self, p):
         print("entra ciclow")
-        pass
+        return p
 
-    @_('FROM variable EQ expresion TO expresion DO bloque')
+    @_('WHILE')
+    def ciclow2(self, p):
+        print("entra ciclow2")
+        return p
+
+    @_('"(" expresion ")"')
+    def ciclow3(self, p):
+        print("entra ciclow3")
+        return p
+
+    @_('FROM ciclof2 ASSIGN ciclof3 ciclof4 bloque')
     def ciclof(self, p):
         print("entra ciclof")
-        pass
+        return p
+
+    @_('variable')
+    def ciclof2(self, p):
+        print("entra ciclof2")
+        return p
+
+    @_('expresion TO')
+    def ciclof3(self, p):
+        print("entra ciclof3")
+        return p
+
+    @_('expresion DO')
+    def ciclof4(self, p):
+        print("entra ciclof4")
+        return p
 
     @_('punto', 'linea', 'circulo', 'arco', 'penup', 'pendown', 'color', 'grosor', 'limpiar')
     def funcEspecial(self, p):
         print("entra funcEspecial")
-        pass
+        return p
 
     @_('POINT "(" expresion "," expresion ")" ";"')
     def punto(self, p):
         print("entra punto")
-        pass
+        return p
 
     @_('CIRCLE "(" expresion ")" ";"')
     def circulo(self, p):
         print("entra circulo")
-        pass
+        return p
 
     @_('LINE "(" expresion "," linea2 ")" ";"')
     def linea(self, p):
         print("entra linea")
-        pass
+        return p
 
     @_('VERTICAL', 'HORIZONTAL')
     def linea2(self, p):
         print("entra linea2")
-        pass
+        return p
 
     @_('ARC "(" expresion "," expresion ")" ";"')
     def arco(self, p):
         print("entra arco")
-        pass
+        return p
 
     @_('PENUP "(" ")" ";"')
     def penup(self, p):
         print("entra penup")
-        pass
+        return p
 
     @_('PENDOWN "(" ")" ";"')
     def pendown(self, p):
         print("entra pendown")
-        pass
+        return p
 
     @_('COLOR "(" expresion "," expresion "," expresion ")" ";"')
     def color(self, p):
         print("entra color")
-        pass
+        return p
 
     @_('WIDTH "(" expresion ")" ";"')
     def grosor(self, p):
         print("entra grosor")
-        pass
+        return p
 
     @_('CLEAR "(" ")" ";"')
     def limpiar(self, p):
         print("entra limpiar")
-        pass
+        return p
 
     @_('expresion2 expresion3')
     def expresion(self, p):
         print("entra expresion")
-        pass
+        return p
 
     @_('exp')
     def expresion2(self, p):
         print("entra expresion2")
-        pass
+        return p
 
     @_('expresion4 expresion', '')
     def expresion3(self, p):
         print("entra expresion3")
-        pass
+        return p
 
     @_('OR')
     def expresion4(self, p):
         print("entra expresion4")
-        pass
+        return p
 
     @_('exp2 exp3')
     def exp(self, p):
         print("entra exp")
-        pass
+        return p
 
     @_('expA')
     def exp2(self, p):
         print("entra exp2")
-        pass
+        return p
 
     @_('exp4 exp', '')
     def exp3(self, p):
         print("entra exp3")
-        pass
+        return p
 
     @_('AND')
     def exp4(self, p):
         print("entra exp4")
-        pass
+        return p
 
     @_('expA2 expA3')
     def expA(self, p):
         print("entra expA")
-        pass
+        return p
 
     @_('expB')
     def expA2(self, p):
         print("entra expA2")
-        pass
+        return p
 
     @_('expA4 expB', '')
     def expA3(self, p):
         print("entra expA3")
-        pass
+        return p
 
     @_('LT', 'GT', 'EQ', 'NEQ')
     def expA4(self, p):
         print("entra expA4")
-        pass
+        return p
 
     @_('expB2 expB3')
     def expB(self, p):
         print("entra expB")
-        pass
+        return p
 
     @_('termino')
     def expB2(self, p):
         print("entra expB2")
-        pass
+        return p
 
     @_('expB4 expB', '')
     def expB3(self, p):
         print("entra expB3")
-        pass
+        return p
 
     @_('PLUS', 'MINUS')
     def expB4(self, p):
         print("entra expB4")
-        pass
+        return p
 
     @_('termino2 termino3')
     def termino(self, p):
         print("entra termino")
-        pass
+        return p
 
     @_('factor')
     def termino2(self, p):
         print("entra termino2")
-        pass
+        return p
 
     @_('termino4 termino', '')
     def termino3(self, p):
         print("entra termino3")
-        pass
+        return p
 
     @_('MULTIPLY', 'DIVIDE')
     def termino4(self, p):
         print("entra termino4")
-        pass
+        return p
 
     @_('factor2', 'factor7', 'factor8', 'factor9', 'factor10')
     def factor(self, p):
         print("entra factor")
-        pass
+        return p
 
     @_('factor3 factor4')
     def factor2(self, p):
         print("entra factor2")
-        pass
+        return p
 
     @_('"("')
     def factor3(self, p):
         print("entra factor3")
-        pass
+        return p
 
     @_('factor5 factor6')
     def factor4(self, p):
         print("entra factor4")
-        pass
+        return p
 
     @_('expresion')
     def factor5(self, p):
         print("entra factor5")
-        pass
+        return p
 
     @_('")"')
     def factor6(self, p):
         print("entra factor6")
-        pass
+        return p
 
     @_('CTEI')
     def factor7(self, p):
         print("entra factor7")
-        pass
+        return p
 
     @_('CTEF')
     def factor8(self, p):
         print("entra factor8")
-        pass
+        return p
 
     @_('variable')
     def factor9(self, p):
         print("entra factor9")
-        pass
+        print("var factor9: ")
+        print(p.variable)
+        return p
 
     @_('llamada')
     def factor10(self, p):
         print("entra factor10")
-        pass
+        return p
 
 # main
 if __name__ == '__main__':

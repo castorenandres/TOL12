@@ -30,4 +30,10 @@ principal() {
         line(num, vertical);
         penup();
     }
+
+    from cont = numero * 5 to 100 do {
+        pendown();
+        width(cont);
+        penup();
+    }
 }

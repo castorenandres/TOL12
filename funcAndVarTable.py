@@ -20,6 +20,7 @@ class FuncTable():
         "name": name,
         "type": returnType,
         "scope": funcCount,
+        "dir": 0,
         "varT": {}
       }
 
@@ -28,13 +29,12 @@ class FuncTable():
     else:
       print("nombre existente")
 
-  def show(self, scope):
-    #print(self.funcTable[scope])
+  def show(self):
     print(funcTable)
 
 
 class VarTable():
-  def addVar (self, name, varType, size, value):
+  def addVar (self, name, varType, size):
     global varTable
     global funcTable
     global funcCount
@@ -46,20 +46,18 @@ class VarTable():
       if name in funcTable[i]["name"]:
         nameFlag = True
     
-    # checar con globales
     if not nameFlag:
         tempDict = {
             "name": name,
             "type": varType,
-            "size": size,
+            "dim": size,
             "scope": funcCount-1,
-            "value": value
+            "dir": 0,
         }
         funcTable[funcCount-1]["varT"][varCount] = tempDict
         varCount = varCount + 1
     else:
       print("nombre de var existente")
 
-  def show(self, scope):
-    #print(self.varTable[scope])
+  def show(self):
     print(varTable)
