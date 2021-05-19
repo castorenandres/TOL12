@@ -1,11 +1,16 @@
 program test;
 variables 
-    x, y, resultado : int; 
+    x, resultado : int;
+    y : float;
 
 
 principal() {
     x = 5;
-    y = 6;
+    y = 6.3;
     
-    resultado = x + 5;
+    if (x < y & x != 0) then {
+        resultado = 10 - (x + 5) * y / 2;
+    } else {
+        resultado = 0;
+    }
 }

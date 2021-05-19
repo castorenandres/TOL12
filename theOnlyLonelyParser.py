@@ -8,13 +8,14 @@ class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
     funcTypeTemp = 0
     quadCount = 1
-    scope = 0
+    scopeFunc = 0
     quadruples = {}
     idStack = deque()
     sizeStack = deque()
     poper = deque()
     pilaO = deque()
     pTypes = deque()
+    pJumps = deque()
 
     # siguiendo el codigo para tipos: int -> 1, float -> 2
     # siguiendo el codigo para operadores : 
@@ -84,6 +85,18 @@ class TheOnlyLonelyParser(Parser):
         }
     }
     
+    def semantics (self, t_right, t_left, op):
+        return self.semCube[t_left][t_right][op]
+
+    def generateQuad (self, op, left, right, res):
+        tempQuad = {
+            "op": op,
+            "left": left,
+            "right": right,
+            "res": res
+        }
+        self.quadruples[self.quadCount] = tempQuad
+        self.quadCount = self.quadCount + 1
 
     # Grammar rules
 
@@ -424,6 +437,27 @@ class TheOnlyLonelyParser(Parser):
     @_('exp')
     def expresion2(self, p):
         print("entra expresion2")
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 10 -> |
+            if top == 10:
+                print("yep|")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
+                op = self.poper.pop()
+                t_res = self.semantics(t_left, t_right, op)
+                print(t_res)
+                if t_res != -1:
+                    res = "una direccion"
+                    self.generateQuad(op, left, right, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
         return p
 
     @_('expresion4 expresion', '')
@@ -434,6 +468,10 @@ class TheOnlyLonelyParser(Parser):
     @_('OR')
     def expresion4(self, p):
         print("entra expresion4")
+        # codes: 10 -> |
+        if p[0] == '|':
+            print("added |")
+            self.poper.append(10)
         return p
 
     @_('exp2 exp3')
@@ -444,6 +482,27 @@ class TheOnlyLonelyParser(Parser):
     @_('expA')
     def exp2(self, p):
         print("entra exp2")
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 9 -> &
+            if top == 9:
+                print("yep&")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
+                op = self.poper.pop()
+                t_res = self.semantics(t_left, t_right, op)
+                print(t_res)
+                if t_res != -1:
+                    res = "una direccion"
+                    self.generateQuad(op, left, right, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
         return p
 
     @_('exp4 exp', '')
@@ -454,6 +513,10 @@ class TheOnlyLonelyParser(Parser):
     @_('AND')
     def exp4(self, p):
         print("entra exp4")
+        # codes: 9 -> &
+        if p[0] == '&':
+            print("added &")
+            self.poper.append(9)
         return p
 
     @_('expA2 expA3')
@@ -464,9 +527,30 @@ class TheOnlyLonelyParser(Parser):
     @_('expB')
     def expA2(self, p):
         print("entra expA2")
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 5 -> == , 6 -> !=, 7 -> >, 8 -> <
+            if top == 5 or top == 6 or top == 7 or top == 8:
+                print("yep<>==!=")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
+                op = self.poper.pop()
+                t_res = self.semantics(t_left, t_right, op)
+                print(t_res)
+                if t_res != -1:
+                    res = "una direccion"
+                    self.generateQuad(op, left, right, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
         return p
 
-    @_('expA4 expB', '')
+    @_('expA4 expA', '')
     def expA3(self, p):
         print("entra expA3")
         return p
@@ -474,6 +558,19 @@ class TheOnlyLonelyParser(Parser):
     @_('LT', 'GT', 'EQ', 'NEQ')
     def expA4(self, p):
         print("entra expA4")
+        # codes: 5 -> == , 6 -> !=, 7 -> >, 8 -> <
+        if p[0] == '>':
+            print("added >")
+            self.poper.append(7)
+        elif p[0] == '<':
+            print("added <")
+            self.poper.append(8)
+        elif p[0] == '==':
+            print("added ==")
+            self.poper.append(5)
+        elif p[0] == '!=':
+            print("added !=")
+            self.poper.append(6)
         return p
 
     @_('expB2 expB3')
@@ -484,6 +581,27 @@ class TheOnlyLonelyParser(Parser):
     @_('termino')
     def expB2(self, p):
         print("entra expB2")
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 1 -> +, 2 -> -
+            if top == 1 or top == 2:
+                print("yep+-")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
+                op = self.poper.pop()
+                t_res = self.semantics(t_left, t_right, op)
+                print(t_res)
+                if t_res != -1:
+                    res = "una direccion"
+                    self.generateQuad(op, left, right, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
         return p
 
     @_('expB4 expB', '')
@@ -494,6 +612,13 @@ class TheOnlyLonelyParser(Parser):
     @_('PLUS', 'MINUS')
     def expB4(self, p):
         print("entra expB4")
+        # codes: 1 -> +, 2 -> -
+        if p[0] == '+':
+            print("added +")
+            self.poper.append(1)
+        elif p[0] == '-':
+            print("added -")
+            self.poper.append(2)
         return p
 
     @_('termino2 termino3')
@@ -504,6 +629,31 @@ class TheOnlyLonelyParser(Parser):
     @_('factor')
     def termino2(self, p):
         print("entra termino2")
+        print("poper: ", self.poper)
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 3 -> *, 4 -> /
+            if top == 3 or top == 4:
+                print("yep")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
+                op = self.poper.pop()
+                t_res = self.semantics(t_left, t_right, op)
+                print(t_res)
+                if t_res != -1:
+                    res = "una direccion"
+                    self.generateQuad(op, left, right, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
+        else:
+            print("poper vacio")
+            
         return p
 
     @_('termino4 termino', '')
@@ -514,6 +664,13 @@ class TheOnlyLonelyParser(Parser):
     @_('MULTIPLY', 'DIVIDE')
     def termino4(self, p):
         print("entra termino4")
+        # codes: 3 -> *, 4 -> /
+        if p[0] == '*':
+            print("added *")
+            self.poper.append(3)
+        elif p[0] == '/':
+            print("added /")
+            self.poper.append(4)
         return p
 
     @_('factor2', 'factor7', 'factor8', 'factor9', 'factor10')
@@ -529,6 +686,7 @@ class TheOnlyLonelyParser(Parser):
     @_('"("')
     def factor3(self, p):
         print("entra factor3")
+        self.poper.append("(")
         return p
 
     @_('factor5 factor6')
@@ -544,23 +702,29 @@ class TheOnlyLonelyParser(Parser):
     @_('")"')
     def factor6(self, p):
         print("entra factor6")
+        self.poper.pop()
         return p
 
     @_('CTEI')
     def factor7(self, p):
         print("entra factor7")
+        self.pilaO.append(p.CTEI)
+        self.pTypes.append(1)
         return p
 
     @_('CTEF')
     def factor8(self, p):
         print("entra factor8")
+        self.pilaO.append(p.CTEF)
+        self.pTypes.append(2)
         return p
 
     @_('variable')
     def factor9(self, p):
         print("entra factor9")
-        print("var factor9: ")
-        print(p.variable)
+        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        self.pilaO.append(p.variable[1])
+        self.pTypes.append(tempType)
         return p
 
     @_('llamada')
@@ -570,7 +734,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("prueba.txt", 'r')
+    file = open("pruebaEsp.txt", 'r')
 
     allLines = ""
     for line in file:

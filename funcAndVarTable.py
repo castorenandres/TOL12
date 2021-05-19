@@ -12,7 +12,7 @@ class FuncTable():
 
     nameFlag = False
     for i in range(len(funcTable)):
-      if name in funcTable[i]["name"]:
+      if name == funcTable[i]["name"]:
         nameFlag = True
     
     if not nameFlag:
@@ -42,10 +42,16 @@ class VarTable():
     nameFlag = False
     tempDict = {}
 
+    # check if variable name exists as a function name
     for i in range(len(funcTable)):
-      if name in funcTable[i]["name"]:
+      if name == funcTable[i]["name"]:
         nameFlag = True
     
+    # check if variable name exists as another local variable
+    for i in range(len(funcTable[funcCount-1]["varT"])):
+      if name == funcTable[funcCount-1]["varT"][i]["name"]:
+        nameFlag = True
+
     if not nameFlag:
         tempDict = {
             "name": name,
@@ -58,6 +64,16 @@ class VarTable():
         varCount = varCount + 1
     else:
       print("nombre de var existente")
+
+  def searchVar (self, id, scope):
+    print("serchVar entra")
+    for i in range(len(funcTable[scope]["varT"])):
+      if id == funcTable[scope]["varT"][i]["name"]:
+        return funcTable[scope]["varT"][i]["type"]
+
+    # print("variable does not exists")
+    # exit()
+    raise NameError("variable does not exists")
 
   def show(self):
     print(varTable)
