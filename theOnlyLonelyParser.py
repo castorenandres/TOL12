@@ -7,7 +7,7 @@ from funcAndVarTable import VarTable
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
     funcTypeTemp = 0
-    quadCount = 1
+    quadCount = 2
     scopeFunc = 0
     quadruples = {}
     idStack = deque()
@@ -42,7 +42,8 @@ class TheOnlyLonelyParser(Parser):
                 7: 1,
                 8: 1,
                 9: 1,
-                10: 1
+                10: 1,
+                11: 1
             },
             2: {
                 1: 2,
@@ -54,7 +55,8 @@ class TheOnlyLonelyParser(Parser):
                 7: 1,
                 8: 1,
                 9: -1,
-                10: -1
+                10: -1,
+                11: -1
             }
         },
         2: {
@@ -68,7 +70,8 @@ class TheOnlyLonelyParser(Parser):
                 7: 1,
                 8: 1,
                 9: -1,
-                10: -1
+                10: -1,
+                11: 2
             },
             2: {
                 1: 2,
@@ -80,12 +83,13 @@ class TheOnlyLonelyParser(Parser):
                 7: 1,
                 8: 1,
                 9: -1,
-                10: -1
+                10: -1,
+                11: 2
             }
         }
     }
     
-    def semantics (self, t_right, t_left, op):
+    def semantics (self, t_left, t_right, op):
         return self.semCube[t_left][t_right][op]
 
     def generateQuad (self, op, left, right, res):
@@ -95,7 +99,7 @@ class TheOnlyLonelyParser(Parser):
             "right": right,
             "res": res
         }
-        self.quadruples[self.quadCount] = tempQuad
+        self.quadruples[self.quadCount-1] = tempQuad
         self.quadCount = self.quadCount + 1
 
     # Grammar rules
@@ -106,6 +110,7 @@ class TheOnlyLonelyParser(Parser):
         print("ids: " + str(len(self.idStack)))
         print("size: " + str(len(self.sizeStack)))
         print(functTable.show())
+        print(self.quadruples)
         pass
 
     @_('ID')
@@ -277,16 +282,45 @@ class TheOnlyLonelyParser(Parser):
     @_('asignacion2 asignacion3 expresion ";"')
     def asignacion(self, p):
         print("entra asignacion")
+        if len(self.poper) > 0:
+            top = self.poper[len(self.poper)-1]
+            print("top: ", top)
+            # codes: 11 -> =
+            if top == 11:
+                print("yep=")
+                right = self.pilaO.pop()
+                t_right = self.pTypes.pop()
+                res = self.pilaO.pop()
+                t_res = self.pTypes.pop()
+                op = self.poper.pop()
+                t_asign = self.semantics(t_res, t_right, op)
+                print(t_asign)
+                print("op: ", op)
+                print("res: ", t_res)
+                print("right: ", t_right)
+                print("asign: ", t_asign)
+                if t_asign != -1:
+                    self.generateQuad(op, right, None, res)
+                    print(self.quadruples)
+                    self.pilaO.append(res)
+                    self.pTypes.append(t_res)
+                else:
+                    raise TypeError("type mismatch")
         return p
 
     @_('variable')
     def asignacion2(self, p):
         print("entra asignacion2")
+        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        self.pilaO.append(p.variable[1])
+        self.pTypes.append(tempType)
         return p
 
     @_('ASSIGN')
     def asignacion3(self, p):
         print("entra asignacion3")
+        # codes: 11 -> =
+        self.poper.append(11)
         return p
 
     @_('ID "(" expresion llamada2 ")" ";"')
@@ -322,11 +356,22 @@ class TheOnlyLonelyParser(Parser):
     @_('IF condicion2 THEN bloque condicion3')
     def condicion(self, p):
         print("entra condicion")
+        end = self.pJumps.pop()
+        self.generateQuad(33, end, self.quadCount, None)
         return p
 
     @_('"(" expresion ")"')
     def condicion2(self, p):
         print("entra condicion2")
+        t_exp = self.pTypes.pop()
+        if t_exp != 1:
+            raise TypeError("type mismatch")
+        else:
+            res = self.pilaO.pop()
+            # codes: 31 -> gotoF
+            self.generateQuad(31, res, None, None)
+            self.pJumps.append(self.quadCount - 1)
+            print(self.pJumps)
         return p
 
     @_('condicion4 bloque', '')
@@ -337,6 +382,10 @@ class TheOnlyLonelyParser(Parser):
     @_('ELSE')
     def condicion4(self, p):
         print("entra condicion4")
+        self.generateQuad(30, None, None, None)
+        false_stm = self.pJumps.pop()
+        self.pJumps.append(self.quadCount - 1)
+        self.generateQuad(33, false_stm, self.quadCount, None)
         return p
 
     @_('ciclow2 ciclow3 DO bloque')

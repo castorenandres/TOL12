@@ -9,6 +9,13 @@ Codigo numerico para operadores
 8 -> <
 9 -> &
 10 -> |
+11 -> =
+
+Codigo numerico para operaciones de cuadruplos
+30 -> goto
+31 -> gotoF
+32 -> gotoV
+33 -> fill
 
 
 Codigo de tipos
