@@ -683,7 +683,11 @@ class TheOnlyLonelyParser(Parser):
                 t_res = self.semantics(t_left, t_right, op)
                 print(t_res)
                 if t_res != -1:
-                    res = "una direccion"
+                    #agregar temporal int
+                    # res =
+                    self.contTempi = self.contTempi + 1
+
+                    res = "una direccion" #borrar
                     self.generateQuad(op, left, right, res)
                     print(self.quadruples)
                     self.pilaO.append(res)
@@ -728,7 +732,11 @@ class TheOnlyLonelyParser(Parser):
                 t_res = self.semantics(t_left, t_right, op)
                 print(t_res)
                 if t_res != -1:
-                    res = "una direccion"
+                    #agregar temporal int
+                    # res =
+                    self.contTempi = self.contTempi + 1
+
+                    res = "una direccion" #borrar
                     self.generateQuad(op, left, right, res)
                     print(self.quadruples)
                     self.pilaO.append(res)
@@ -773,7 +781,11 @@ class TheOnlyLonelyParser(Parser):
                 t_res = self.semantics(t_left, t_right, op)
                 print(t_res)
                 if t_res != -1:
-                    res = "una direccion"
+                    #agregar temporal int
+                    # res =
+                    self.contTempi = self.contTempi + 1
+
+                    res = "una direccion" #borrar
                     self.generateQuad(op, left, right, res)
                     print(self.quadruples)
                     self.pilaO.append(res)
@@ -827,7 +839,15 @@ class TheOnlyLonelyParser(Parser):
                 t_res = self.semantics(t_left, t_right, op)
                 print(t_res)
                 if t_res != -1:
-                    res = "una direccion"
+                    if t_res == 1:
+                        #agregar temporal int
+                        # res =
+                        self.contTempi = self.contTempi + 1
+                    else:
+                        # agregar temporal f
+                        # res = 
+                        self.contTempf = self.contTempf + 1 
+                    res = "una direccion" #borrar esta linea
                     self.generateQuad(op, left, right, res)
                     print(self.quadruples)
                     self.pilaO.append(res)
@@ -876,7 +896,15 @@ class TheOnlyLonelyParser(Parser):
                 t_res = self.semantics(t_left, t_right, op)
                 print(t_res)
                 if t_res != -1:
-                    res = "una direccion"
+                    if t_res == 1:
+                        #agregar temporal int
+                        # res =
+                        self.contTempi = self.contTempi + 1
+                    else:
+                        # agregar temporal f
+                        # res = 
+                        self.contTempf = self.contTempf + 1 
+                    res = "una direccion" #quitar esta linea
                     self.generateQuad(op, left, right, res)
                     print(self.quadruples)
                     self.pilaO.append(res)
