@@ -26,7 +26,7 @@ class FuncTable():
         # "scope": funcCount,
         "dir": 0,
         "param": [],
-        "size": [],
+        "size": {},
         "varT": {}
       }
 
@@ -36,6 +36,30 @@ class FuncTable():
       # funcCount = funcCount + 1
     else:
       raise NameError("function name already exists")
+
+  def setFuncSize (self, name, parami, paramf, vari, varf, tempi, tempf):
+    global funcTable
+
+    if name in funcTable:
+      funcSize = {
+        "parami": parami,
+        "paramf": paramf,
+        "vari": vari,
+        "varf": varf,
+        "tempi": tempi,
+        "tempf": tempf
+      }
+      funcTable[name]["size"] = funcSize
+    else:
+      raise NameError("function does not exists")
+
+  def getParam (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return funcTable[name]["param"]
+    else:
+      raise NameError("function does not exists")
 
   def show(self):
     print(funcTable)

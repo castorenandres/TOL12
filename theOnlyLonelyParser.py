@@ -8,7 +8,6 @@ class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
     funcTypeTemp = 0
     quadCount = 1
-    # scopeFunc = 0
     currFuncName = ''
     quadruples = {}
     idStack = deque()
@@ -17,6 +16,7 @@ class TheOnlyLonelyParser(Parser):
     pilaO = deque()
     pTypes = deque()
     pJumps = deque()
+    funcNames = deque()
 
     # contadores para memorias
 
