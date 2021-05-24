@@ -9,6 +9,12 @@ class TheOnlyLonelyParser(Parser):
     funcTypeTemp = 0
     quadCount = 1
     currFuncName = ''
+    contParami = 0
+    contParamf = 0
+    contVari = 0
+    contVarf = 0
+    contTempi = 0
+    contTempf = 0
     quadruples = {}
     idStack = deque()
     sizeStack = deque()
@@ -115,6 +121,7 @@ class TheOnlyLonelyParser(Parser):
         print(functTable.show())
         print("ptypes: ", self.pTypes)
         print(self.quadruples)
+        print(self.currFuncName)
         pass
 
     @_('ID')
@@ -145,6 +152,11 @@ class TheOnlyLonelyParser(Parser):
         # # funcTable.show(0)
         # print(funcTable)
         print("entra func")
+        functTable.delVarT(self.currFuncName)
+        # codes: 37 -> EndFunc
+        self.generateQuad(37, None, None, None)
+        functTable.setFuncSize(self.currFuncName, self.contParami, self.contParamf, self.contVari, self.contVarf, self.contTempi, self.contTempf)
+        self.currFuncName = self.funcNames.pop()
         
         return p
 
@@ -152,6 +164,15 @@ class TheOnlyLonelyParser(Parser):
     def func5(self, p):
         print("entra func5")
         functTable.addFunc(p.ID,self.funcTypeTemp)
+        self.funcNames.append(self.currFuncName)
+        self.currFuncName = p.ID
+        self.contParami = 0
+        self.contParamf = 0
+        self.contVari = 0
+        self.contVarf = 0
+        self.contTempi = 0
+        self.contTempf = 0
+
 
     @_('tiposimple', 'VOID')
     def func2(self, p):
@@ -171,6 +192,8 @@ class TheOnlyLonelyParser(Parser):
     @_('vars', '')
     def func3(self, p):
         print("entra func3")
+        # meter direccion inicial de la funcion
+        functTable.setDir(self.currFuncName, self.quadCount)
         return p
 
     @_('func', '')
@@ -219,10 +242,12 @@ class TheOnlyLonelyParser(Parser):
         if p.tiposimple[1] == 'int':
             for x in range(len(self.idStack)):
                 varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop())
+                self.contVari = self.contVari + 1
                 # print(self.idStack.pop(), 'int', self.sizeStack.pop())
         elif p.tiposimple[1] == 'float':
             for x in range(len(self.idStack)):
                 varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop())
+                self.contVarf = self.contVarf + 1
                 # print(self.idStack.pop(), 'float', self.sizeStack.pop())
         functTable.show()
         print(p.tiposimple)
@@ -244,8 +269,12 @@ class TheOnlyLonelyParser(Parser):
 
         if p.tiposimple[1] == 'int':
             varTable.addVar(p.ID, 1, 0)
+            functTable.setParam(self.currFuncName, [1])
+            self.contParami = self.contParami + 1
         elif p.tiposimple[1] == 'float':
             varTable.addVar(p.ID, 2, 0)
+            functTable.setParam(self.currFuncName, [2])
+            self.contParamf = self.contParamf + 1
 
         return p
 
@@ -366,10 +395,18 @@ class TheOnlyLonelyParser(Parser):
     @_('RETURN "(" expresion ")" ";"')
     def retorno(self, p):
         print("entra retorno")
-        res = self.pilaO.pop()
-        # self.pTypes.pop()
-        # print(self.pTypes)
-        self.generateQuad(100, None, None, res)
+        tempFuncType = functTable.getType(self.currFuncName)
+        if (tempFuncType != 3):
+            res = self.pilaO.pop()
+            t_res = self.pTypes.pop()
+            if (tempFuncType == t_res):
+                self.generateQuad(100, None, None, res)
+            else:
+                raise TypeError("Type mismatch")
+            # print(self.pTypes)
+        else:
+            raise TypeError("Void function does not use return")
+            
         return p
 
     @_('READ "(" variable ")" ";"')

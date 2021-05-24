@@ -24,7 +24,7 @@ class FuncTable():
         # "name": name,
         "type": returnType,
         # "scope": funcCount,
-        "dir": 0,
+        "dir": None,
         "param": [],
         "size": {},
         "varT": {}
@@ -53,13 +53,53 @@ class FuncTable():
     else:
       raise NameError("function does not exists")
 
+  def setParam (self, name, param):
+    global funcTable
+
+    if name in funcTable:
+      funcTable[name]["param"].extend(param)
+    else:
+      raise NameError("Function does not exists")
+
   def getParam (self, name):
     global funcTable
 
     if name in funcTable:
       return funcTable[name]["param"]
     else:
-      raise NameError("function does not exists")
+      raise NameError("Function does not exists")
+
+  def getType (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return funcTable[name]["type"]
+    else:
+      raise NameError("Function does not exists")
+
+  def setDir (self, name, address):
+    global funcTable
+
+    if name in funcTable:
+      funcTable[name]["dir"] = address
+    else:
+      raise NameError("Function does not exists")
+
+  def searchFunc (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return 1
+    else:
+      raise NameError("Function does not exists")
+
+  def delVarT (self, name):
+    global funcTable
+
+    if name in funcTable:
+      del funcTable[name]["varT"]
+    else:
+      raise NameError("Function name does not exists")
 
   def show(self):
     print(funcTable)
