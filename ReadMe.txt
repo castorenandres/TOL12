@@ -31,9 +31,34 @@ Tercer avance:
         metodos para las tablas de funciones y variables (parcial)
 
 Cuarto avance:
-    Rediseñar/Dividir reglas por la herramienta:
-        ya funciona bien guardar funciones y variables
-        faltan checar las demas reglas
+    Rediseño y división de reglas para expresiones completa.
+    Rediseño y división de reglas para estatutos no lineales en proceso.
     Programado:
-        se agregaron reglas
+        se agregaron reglas para expresiones.
         se pueden agregar funciones y variables a las tablas.
+        falta integrar los cuadruplos para expresiones.
+
+Quinto avance:
+    Rediseño y división de reglas para estatutos no lineales casi completa, se esta diseñando para el ciclo for.
+    Diseñando cuadruplos.
+    Programado:
+        se agregaron reglas para estatutos no lineales.
+        falta integrar los cuadruplos para estatutos no lineales.
+
+Sexto avance:
+    Trabajando todavia en el diseño para el ciclo de for.
+    Diseñando una tablita para asiganrle un codigo numerico (numero) a los operadores para usar en los cuadruplos.
+
+Septimo avance:
+    Se implementaron cuadruplos para expresiones y para estatutos lineales, falta ponerlo con direcciones de memoria.
+    Cambio de llaves en las estructuras de las tablas de funciones y variables.
+    Diseñando la division para reglas gramaticales para funciones y llamadas a funcion.
+
+    Haciendo:
+    generando metodos y estructuras que se utilizaran para los cuadruplos de funciones y sus llamadas.
+
+    Pendiente:
+    Se implementaron cuadruplos para funciones y llamadas, falta ponerlo con direcciones de memoria.
+    Diseñando las direcciones para los cuadruplos
+    Pensando como diseñar la memoria
+    Viendo como se hace la maquina virtual
