@@ -17,6 +17,19 @@ Codigo numerico para operaciones de cuadruplos
 32 -> gotoV
 33 -> fill
 
+codigo numerico para funciones predefinidas:
+100 -> return
+101 -> read
+102 -> write
+103 -> point
+104 -> circle
+105 -> line
+106 -> arc
+107 -> penup
+108 -> pendown
+109 -> color
+110 -> width
+111 -> clear
 
 Codigo de tipos
 1 -> int

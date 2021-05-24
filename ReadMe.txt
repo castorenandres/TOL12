@@ -48,4 +48,17 @@ Quinto avance:
 Sexto avance:
     Trabajando todavia en el diseño para el ciclo de for.
     Diseñando una tablita para asiganrle un codigo numerico (numero) a los operadores para usar en los cuadruplos.
-    
+
+Septimo avance:
+    Se implementaron cuadruplos para expresiones y para estatutos lineales, falta ponerlo con direcciones de memoria.
+    Cambio de llaves en las estructuras de las tablas de funciones y variables.
+    Diseñando la division para reglas gramaticales para funciones y llamadas a funcion.
+
+    Haciendo:
+    generando metodos y estructuras que se utilizaran para los cuadruplos de funciones y sus llamadas.
+
+    Pendiente:
+    Se implementaron cuadruplos para funciones y llamadas, falta ponerlo con direcciones de memoria.
+    Diseñando las direcciones para los cuadruplos
+    Pensando como diseñar la memoria
+    Viendo como se hace la maquina virtual

@@ -7,8 +7,9 @@ from funcAndVarTable import VarTable
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
     funcTypeTemp = 0
-    quadCount = 2
-    scopeFunc = 0
+    quadCount = 1
+    # scopeFunc = 0
+    currFuncName = ''
     quadruples = {}
     idStack = deque()
     sizeStack = deque()
@@ -16,6 +17,8 @@ class TheOnlyLonelyParser(Parser):
     pilaO = deque()
     pTypes = deque()
     pJumps = deque()
+
+    # contadores para memorias
 
     # siguiendo el codigo para tipos: int -> 1, float -> 2
     # siguiendo el codigo para operadores : 
@@ -93,6 +96,7 @@ class TheOnlyLonelyParser(Parser):
         return self.semCube[t_left][t_right][op]
 
     def generateQuad (self, op, left, right, res):
+        self.quadCount = self.quadCount + 1
         tempQuad = {
             "op": op,
             "left": left,
@@ -100,7 +104,6 @@ class TheOnlyLonelyParser(Parser):
             "res": res
         }
         self.quadruples[self.quadCount-1] = tempQuad
-        self.quadCount = self.quadCount + 1
 
     # Grammar rules
 
@@ -110,6 +113,7 @@ class TheOnlyLonelyParser(Parser):
         print("ids: " + str(len(self.idStack)))
         print("size: " + str(len(self.sizeStack)))
         print(functTable.show())
+        print("ptypes: ", self.pTypes)
         print(self.quadruples)
         pass
 
@@ -117,6 +121,7 @@ class TheOnlyLonelyParser(Parser):
     def programa4(self, p):
         print("entra programa4")
         functTable.addFunc(p.ID, 3)
+        self.currFuncName = p.ID
         print("func table: ")
         functTable.show()
         return p
@@ -311,7 +316,7 @@ class TheOnlyLonelyParser(Parser):
     @_('variable')
     def asignacion2(self, p):
         print("entra asignacion2")
-        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        tempType = varTable.searchVar(p.variable[1], self.currFuncName)
         self.pilaO.append(p.variable[1])
         self.pTypes.append(tempType)
         return p
@@ -323,24 +328,55 @@ class TheOnlyLonelyParser(Parser):
         self.poper.append(11)
         return p
 
-    @_('ID "(" expresion llamada2 ")" ";"')
+    @_('llamada2 llamada3 llamada4 llamada7 ";"')
     def llamada(self, p):
         print("entra llamada")
         return p
 
-    @_('"," expresion llamada2', '')
+    @_('ID')
     def llamada2(self, p):
         print("entra llamada2")
+        return p
+
+    @_('"("')
+    def llamada3(self, p):
+        print("entra llamada3")
+        return p
+
+    @_('expresion llamada5')
+    def llamada4(self, p):
+        print("entra llamada4")
+        return p
+
+    @_('llamada6 llamada4', '')
+    def llamada5(self, p):
+        print("entra llamada5")
+        return p
+
+    @_('","')
+    def llamada6(self, p):
+        print("entra llamada6")
+        return p
+
+    @_('")"')
+    def llamada7(self, p):
+        print("entra llamada7")
         return p
 
     @_('RETURN "(" expresion ")" ";"')
     def retorno(self, p):
         print("entra retorno")
+        res = self.pilaO.pop()
+        # self.pTypes.pop()
+        # print(self.pTypes)
+        self.generateQuad(100, None, None, res)
         return p
 
     @_('READ "(" variable ")" ";"')
     def lectura(self, p):
         print("entra lectura")
+        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        self.generateQuad(101, None, None, p.variable[1])
         return p
 
     @_('WRITE "(" escritura2 ")" ";"')
@@ -351,13 +387,21 @@ class TheOnlyLonelyParser(Parser):
     @_('expresion', 'CTESTRING')
     def escritura2(self, p):
         print("entra escritura2")
+        if p[0] == 'CTESTRING':
+            self.generateQuad(102, None, None, p[0])
+        else:
+            res = self.pilaO.pop()
+            # self.pTypes.pop()
+            # print(self.pTypes)
+            self.generateQuad(102, None, None, res)
         return p
 
     @_('IF condicion2 THEN bloque condicion3')
     def condicion(self, p):
         print("entra condicion")
         end = self.pJumps.pop()
-        self.generateQuad(33, end, self.quadCount, None)
+        # codes: 33 -> fill
+        self.generateQuad(33, end, self.quadCount + 1, None)
         return p
 
     @_('"(" expresion ")"')
@@ -382,45 +426,96 @@ class TheOnlyLonelyParser(Parser):
     @_('ELSE')
     def condicion4(self, p):
         print("entra condicion4")
+        # codes: 30 -> goto
         self.generateQuad(30, None, None, None)
         false_stm = self.pJumps.pop()
         self.pJumps.append(self.quadCount - 1)
-        self.generateQuad(33, false_stm, self.quadCount, None)
+        # codes: 33 -> fill
+        self.generateQuad(33, false_stm, self.quadCount + 1, None)
         return p
 
     @_('ciclow2 ciclow3 DO bloque')
     def ciclow(self, p):
         print("entra ciclow")
+        end = self.pJumps.pop()
+        ret = self.pJumps.pop()
+        # codes: 30 -> goto
+        self.generateQuad(30, ret, None, None)
+        # codes: 33 -> fill
+        self.generateQuad(33, end, self.quadCount + 1, None)
         return p
 
     @_('WHILE')
     def ciclow2(self, p):
         print("entra ciclow2")
+        self.pJumps.append(self.quadCount)
+        print(self.quadCount)
         return p
 
     @_('"(" expresion ")"')
     def ciclow3(self, p):
         print("entra ciclow3")
+        t_exp = self.pTypes.pop()
+        if t_exp != 1:
+            raise TypeError("type mismatch")
+        else:
+            res = self.pilaO.pop()
+            # codes: 31 -> gotoF
+            self.generateQuad(31, res, None, None)
+            self.pJumps.append(self.quadCount - 1)
         return p
 
     @_('FROM ciclof2 ASSIGN ciclof3 ciclof4 bloque')
     def ciclof(self, p):
         print("entra ciclof")
+        self.generateQuad(1, "vControl", 1, "una direccionY")
+        end = self.pJumps.pop()
+        ret = self.pJumps.pop()
+        self.generateQuad(30, ret, None, None)
+        self.generateQuad(33, end, self.quadCount + 1, None)
         return p
 
     @_('variable')
     def ciclof2(self, p):
         print("entra ciclof2")
+        tempType = varTable.searchVar(p.variable[1], self.currFuncName)
+        if tempType == 1:
+            self.pilaO.append(p.variable[1])
+            self.pTypes.append(tempType)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('expresion TO')
     def ciclof3(self, p):
         print("entra ciclof3")
+        t_exp = self.pTypes.pop()
+        if t_exp != 1:
+            raise TypeError("Type mismatch")
+        else:
+            exp = self.pilaO.pop()
+            vControl = self.pilaO.pop()
+            t_vControl = self.pTypes.pop()
+            t_res = self.semantics(t_vControl, t_exp, 11)
+            if t_res == -1:
+                raise TypeError("Type mismatch")
+            else:
+                self.generateQuad(11, exp, None, vControl)
         return p
 
     @_('expresion DO')
     def ciclof4(self, p):
         print("entra ciclof4")
+        t_exp = self.pTypes.pop()
+        if t_exp != 1:
+            raise TypeError("Type mismatch")
+        else:
+            exp = self.pilaO.pop()
+            self.generateQuad(11, exp, None, "vFinal")
+            self.generateQuad(8, "vControl", "vFinal", "una direccionX")
+            self.pJumps.append(self.quadCount - 1)
+            self.generateQuad(31, "una direccionX", None, None)
+            self.pJumps.append(self.quadCount - 1)
         return p
 
     @_('punto', 'linea', 'circulo', 'arco', 'penup', 'pendown', 'color', 'grosor', 'limpiar')
@@ -431,16 +526,38 @@ class TheOnlyLonelyParser(Parser):
     @_('POINT "(" expresion "," expresion ")" ";"')
     def punto(self, p):
         print("entra punto")
+        res2 = self.pilaO.pop()
+        t_res2 = self.pTypes.pop()
+        res1 = self.pilaO.pop()
+        t_res1 = self.pTypes.pop()
+
+        if (t_res2 == 1 or t_res2 == 2) and (t_res1 == 1 or t_res1 == 2):
+            self.generateQuad(103, res1, res2, None)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('CIRCLE "(" expresion ")" ";"')
     def circulo(self, p):
         print("entra circulo")
+        res = self.pilaO.pop()
+        t_res = self.pTypes.pop()
+        if t_res == 1 or t_res == 2:
+            self.generateQuad(104, res, None, None)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('LINE "(" expresion "," linea2 ")" ";"')
     def linea(self, p):
         print("entra linea")
+        print(p.linea2[1])
+        res = self.pilaO.pop()
+        t_res = self.pTypes.pop()
+        if t_res == 1 or t_res == 2:
+            self.generateQuad(105, res, p.linea2[1], None)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('VERTICAL', 'HORIZONTAL')
@@ -451,31 +568,60 @@ class TheOnlyLonelyParser(Parser):
     @_('ARC "(" expresion "," expresion ")" ";"')
     def arco(self, p):
         print("entra arco")
+        res2 = self.pilaO.pop()
+        t_res2 = self.pTypes.pop()
+        res1 = self.pilaO.pop()
+        t_res1 = self.pTypes.pop()
+
+        if (t_res2 == 1 or t_res2 == 2) and (t_res1 == 1 or t_res1 == 2):
+            self.generateQuad(106, res1, res2, None)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('PENUP "(" ")" ";"')
     def penup(self, p):
         print("entra penup")
+        self.generateQuad(107, None, None, None)
         return p
 
     @_('PENDOWN "(" ")" ";"')
     def pendown(self, p):
         print("entra pendown")
+        self.generateQuad(108, None, None, None)
         return p
 
     @_('COLOR "(" expresion "," expresion "," expresion ")" ";"')
     def color(self, p):
         print("entra color")
+        res3 = self.pilaO.pop()
+        t_res3 = self.pTypes.pop()
+        res2 = self.pilaO.pop()
+        t_res2 = self.pTypes.pop()
+        res1 = self.pilaO.pop()
+        t_res1 = self.pTypes.pop()
+
+        if (t_res2 == 1 or t_res2 == 2) and (t_res1 == 1 or t_res1 == 2) and (t_res3 == 1 or t_res3 == 2):
+            self.generateQuad(109, res1, res2, res3)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('WIDTH "(" expresion ")" ";"')
     def grosor(self, p):
         print("entra grosor")
+        res = self.pilaO.pop()
+        t_res = self.pTypes.pop()
+        if t_res == 1 or t_res == 2:
+            self.generateQuad(110, res, None, None)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('CLEAR "(" ")" ";"')
     def limpiar(self, p):
         print("entra limpiar")
+        self.generateQuad(111, None, None, None)
         return p
 
     @_('expresion2 expresion3')
@@ -771,7 +917,7 @@ class TheOnlyLonelyParser(Parser):
     @_('variable')
     def factor9(self, p):
         print("entra factor9")
-        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        tempType = varTable.searchVar(p.variable[1], self.currFuncName)
         self.pilaO.append(p.variable[1])
         self.pTypes.append(tempType)
         return p
