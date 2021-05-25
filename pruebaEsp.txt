@@ -10,6 +10,9 @@ int function sumar (int x, int y);
 
     if (x < y | x != 1) then {
         y = x;
+    } else {
+        read(y);
+        write("else");
     }
 
     return (x + y);

@@ -7,6 +7,7 @@ from funcAndVarTable import VarTable
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
     funcTypeTemp = 0
+    paramTypeTemp = 0
     quadCount = 1
     currFuncName = ''
     contParami = 0
@@ -15,6 +16,8 @@ class TheOnlyLonelyParser(Parser):
     contVarf = 0
     contTempi = 0
     contTempf = 0
+    paramPointer = 0
+    paramTypes = []
     quadruples = {}
     idStack = deque()
     sizeStack = deque()
@@ -24,7 +27,37 @@ class TheOnlyLonelyParser(Parser):
     pJumps = deque()
     funcNames = deque()
 
-    # contadores para memorias
+    # contadores para direcciones
+    # GLOBALES
+    # intG:      1,000 - 1,999
+    # tempiG:    2,000 - 2,999
+    # floatG:    3,000 - 3,999
+    # tempfG:    4,000 - 4,999
+    
+    intG = 1000
+    tempiG = 2000
+    floatG = 3000
+    tempfG = 4000
+
+    # LOCALES
+    # intL:     5,000 - 5,999
+    # tempiL:   6,000 - 6,999
+    # floatL:   7,000 - 7,999
+    # tempfL:   8,000 - 8,999
+    
+    intL = 5000
+    tempiL = 6000
+    floatL = 7000
+    tempfL = 8000
+
+    # CONSTANTES
+    # intC:         9,000 - 9,999
+    # floatC:       10,000 - 10,999
+    # stringC:      11,000 - 11,999
+
+    intC = 9000
+    floatC = 10000
+    stringC = 11000    
 
     # siguiendo el codigo para tipos: int -> 1, float -> 2
     # siguiendo el codigo para operadores : 
@@ -113,7 +146,7 @@ class TheOnlyLonelyParser(Parser):
 
     # Grammar rules
 
-    @_('PROGRAM programa4 ";" programa2 programa3 principal')
+    @_('programa5 programa4 ";" programa2 programa3 principal')
     def programa(self, p):
         print("entra programa")
         print("ids: " + str(len(self.idStack)))
@@ -123,6 +156,13 @@ class TheOnlyLonelyParser(Parser):
         print(self.quadruples)
         print(self.currFuncName)
         pass
+
+    @_('PROGRAM')
+    def programa5(self, p):
+        print("entra programa5")
+        # codes 30 -> goto
+        # goto Principal
+        self.generateQuad(30, None, None, None)
 
     @_('ID')
     def programa4(self, p):
@@ -152,7 +192,7 @@ class TheOnlyLonelyParser(Parser):
         # # funcTable.show(0)
         # print(funcTable)
         print("entra func")
-        functTable.delVarT(self.currFuncName)
+        # functTable.delVarT(self.currFuncName)
         # codes: 37 -> EndFunc
         self.generateQuad(37, None, None, None)
         functTable.setFuncSize(self.currFuncName, self.contParami, self.contParamf, self.contVari, self.contVarf, self.contTempi, self.contTempf)
@@ -263,24 +303,34 @@ class TheOnlyLonelyParser(Parser):
         print("entra principal")
         return p
 
-    @_('tiposimple ID parametro2')
+    @_('parametro2 parametro3 parametro4')
     def parametro(self, p):
         print("entra parametro")
+        return p
 
+    @_('tiposimple')
+    def parametro2(self, p):
+        print("entra parametro2")
         if p.tiposimple[1] == 'int':
-            varTable.addVar(p.ID, 1, 0)
-            functTable.setParam(self.currFuncName, [1])
-            self.contParami = self.contParami + 1
+            self.paramTypeTemp = 1
         elif p.tiposimple[1] == 'float':
-            varTable.addVar(p.ID, 2, 0)
-            functTable.setParam(self.currFuncName, [2])
-            self.contParamf = self.contParamf + 1
+            self.paramTypeTemp = 2
+        return p
 
+    @_('ID')
+    def parametro3(self, p):
+        print("entra parametro3")
+        varTable.addVar(p.ID, self.paramTypeTemp, 0)
+        functTable.setParam(self.currFuncName, [self.paramTypeTemp])
+        if self.paramTypeTemp == 1:
+            self.contParami = self.contParami + 1
+        else:
+            self.contParamf = self.contParamf + 1
         return p
 
     @_('"," parametro', '')
-    def parametro2(self, p):
-        print("entra parametro2")
+    def parametro4(self, p):
+        print("entra parametro4")
         return p
 
     @_('INT', 'FLOAT')
@@ -336,10 +386,10 @@ class TheOnlyLonelyParser(Parser):
                 if t_asign != -1:
                     self.generateQuad(op, right, None, res)
                     print(self.quadruples)
-                    self.pilaO.append(res)
-                    self.pTypes.append(t_res)
                 else:
                     raise TypeError("type mismatch")
+        else:
+            raise ValueError("No more operands to use")
         return p
 
     @_('variable')
@@ -360,21 +410,49 @@ class TheOnlyLonelyParser(Parser):
     @_('llamada2 llamada3 llamada4 llamada7 ";"')
     def llamada(self, p):
         print("entra llamada")
+        # codes: 36 -> goSub
+        self.generateQuad(36, None, None, self.currFuncName)
+        self.currFuncName = self.funcNames.pop()
         return p
 
     @_('ID')
     def llamada2(self, p):
         print("entra llamada2")
+        isFunc = functTable.searchFunc(p.ID)
+        if isFunc == 1:
+            self.paramTypes = functTable.getParam(p.ID)
+            self.funcNames.append(self.currFuncName)
+            self.currFuncName = p.ID
         return p
 
     @_('"("')
     def llamada3(self, p):
         print("entra llamada3")
+        # codes: 34 -> ERA
+        self.generateQuad(34, None, None, self.currFuncName)
+        self.paramPointer = 0
         return p
 
-    @_('expresion llamada5')
+    @_('llamada8 llamada5')
     def llamada4(self, p):
         print("entra llamada4")
+        return p
+
+    @_('expresion')
+    def llamada8(self, p):
+        print("entra llamada8")
+        argument = self.pilaO.pop()
+        t_argument = self.pTypes.pop()
+        t_params = self.paramTypes[self.paramPointer]
+        print("argumento: " + argument)
+        print("tipo argumento: " + str(t_argument))
+        print("tipo params: " + str(t_params))
+        if t_params == t_argument:
+            # codes: 35 -> Param
+            # paramPointer + 1 porque el indice inicial es 0 y el tamaño cuenta desde 1
+            self.generateQuad(35, argument, None, self.paramPointer + 1)
+        else:
+            raise TypeError("Type mismatch")
         return p
 
     @_('llamada6 llamada4', '')
@@ -385,11 +463,14 @@ class TheOnlyLonelyParser(Parser):
     @_('","')
     def llamada6(self, p):
         print("entra llamada6")
+        self.paramPointer = self.paramPointer + 1
         return p
 
     @_('")"')
     def llamada7(self, p):
         print("entra llamada7")
+        if self.paramPointer + 1 != len(self.paramTypes):
+            raise IndexError("Number of parameters mismatch")
         return p
 
     @_('RETURN "(" expresion ")" ";"')
@@ -412,7 +493,7 @@ class TheOnlyLonelyParser(Parser):
     @_('READ "(" variable ")" ";"')
     def lectura(self, p):
         print("entra lectura")
-        tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
+        # tempType = varTable.searchVar(p.variable[1], self.scopeFunc)
         self.generateQuad(101, None, None, p.variable[1])
         return p
 
@@ -424,11 +505,13 @@ class TheOnlyLonelyParser(Parser):
     @_('expresion', 'CTESTRING')
     def escritura2(self, p):
         print("entra escritura2")
-        if p[0] == 'CTESTRING':
+        print(p[0])
+        print(type(p[0]))
+        if type(p[0]) == str:
             self.generateQuad(102, None, None, p[0])
         else:
             res = self.pilaO.pop()
-            # self.pTypes.pop()
+            self.pTypes.pop()
             # print(self.pTypes)
             self.generateQuad(102, None, None, res)
         return p
