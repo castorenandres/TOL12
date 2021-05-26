@@ -1,96 +1,168 @@
-funcCount = 0
+# global variables
 currentFunc = ''
 funcTable = {}
 varTable = {}
-varCount = 0
+
 class FuncTable():
   def addFunc (self, name, returnType):
     global funcTable
-    global funcCount
-    global varCount
     global currentFunc
 
-    varCount = 0
-
     nameFlag = False
-    # for i in range(len(funcTable)):
-    #   if name == funcTable[i]["name"]:
-    #     nameFlag = True
     if name in funcTable:
       nameFlag = True
     
     if not nameFlag:
       tempDict = {
-        # "name": name,
         "type": returnType,
-        # "scope": funcCount,
-        "dir": 0,
+        "dir": None,
         "param": [],
-        "size": [],
+        "size": {},
         "varT": {}
       }
-
-      # funcTable[funcCount] = tempDict
       funcTable[name] = tempDict
       currentFunc = name
-      # funcCount = funcCount + 1
     else:
       raise NameError("function name already exists")
+
+  def setFuncSize (self, name, parami, paramf, vari, varf, tempi, tempf):
+    global funcTable
+
+    if name in funcTable:
+      funcSize = {
+        "parami": parami,
+        "paramf": paramf,
+        "vari": vari,
+        "varf": varf,
+        "tempi": tempi,
+        "tempf": tempf
+      }
+      funcTable[name]["size"] = funcSize
+    else:
+      raise NameError("function does not exists")
+
+  def setParam (self, name, param):
+    global funcTable
+
+    if name in funcTable:
+      funcTable[name]["param"].extend(param)
+    else:
+      raise NameError("Function does not exists")
+
+  def getParam (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return funcTable[name]["param"]
+    else:
+      raise NameError("Function does not exists")
+
+  def getType (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return funcTable[name]["type"]
+    else:
+      raise NameError("Function does not exists")
+
+  def setDir (self, name, address):
+    global funcTable
+
+    if name in funcTable:
+      funcTable[name]["dir"] = address
+    else:
+      raise NameError("Function does not exists")
+
+  def searchFunc (self, name):
+    global funcTable
+
+    if name in funcTable:
+      return 1
+    else:
+      raise NameError("Function does not exists")
+
+  def delVarT (self, name):
+    global funcTable
+
+    if name in funcTable:
+      del funcTable[name]["varT"]
+    else:
+      raise NameError("Function name does not exists")
 
   def show(self):
     print(funcTable)
 
 
 class VarTable():
-  def addVar (self, name, varType, size):
+  def addVar (self, name, varType, size, address):
     global varTable
     global funcTable
-    global funcCount
-    global varCount
     global currentFunc
     nameFlag = False
     tempDict = {}
 
     # check if variable name exists as a function name
-    # for i in range(len(funcTable)):
-    #   if name == funcTable[i]["name"]:
-    #     nameFlag = True
     if name in funcTable:
       nameFlag = True
     
     # check if variable name exists as another local variable
-    # for i in range(len(funcTable[funcCount-1]["varT"])):
-    #   if name == funcTable[funcCount-1]["varT"][i]["name"]:
-    #     nameFlag = True
     if name in funcTable[currentFunc]:
       nameFlag = True
 
     if not nameFlag:
         tempDict = {
-            # "name": name,
             "type": varType,
             "dim": size,
-            # "scope": funcCount-1,
-            "dir": 0,
+            "dir": address,
         }
-        # funcTable[funcCount-1]["varT"][varCount] = tempDict
         funcTable[currentFunc]["varT"][name] = tempDict
-        # varCount = varCount + 1
     else:
       raise NameError("variable name already exists")
 
-  def searchVar (self, id, funcName):
+  def addFuncNameAsVar (self, name, varType, size, address, globalFunc):
+    global varTable
     global funcTable
-    print("serchVar entra")
-    # for i in range(len(funcTable[scope]["varT"])):
-    #   if id == funcTable[scope]["varT"][i]["name"]:
-    #     return funcTable[scope]["varT"][i]["type"]
-    if id in funcTable[funcName]["varT"]:
-      return funcTable[funcName]["varT"][id]["type"]
+    global currentFunc
+    nameFlag = False
+    tempDict = {}
 
-    # print("variable does not exists")
-    # exit()
-    raise NameError("variable does not exists")
+    # check if variable name exists as a function name
+    if name in funcTable:
+      nameFlag = True
+    
+    # check if variable name exists as another local variable
+    if name in funcTable[globalFunc]:
+      nameFlag = True
+
+    if not nameFlag:
+        tempDict = {
+            "type": varType,
+            "dim": size,
+            "dir": address,
+        }
+        funcTable[globalFunc]["varT"][name] = tempDict
+    else:
+      raise NameError("variable name already exists")
+
+  def getDir (self, id, funcName, globalFunc):
+    global funcTable
+
+    if id in funcTable[funcName]["varT"]:
+      return funcTable[funcName]["varT"][id]["dir"]
+    elif id in funcTable[globalFunc]["varT"]:
+      return funcTable[globalFunc]["varT"][id]["dir"]
+
+    raise NameError("variable does not exists") 
+
+  def searchVar (self, id, funcName, globalFunc):
+    global funcTable
+    
+    if id in funcTable[funcName]["varT"]:
+      return 1
+    elif id in funcTable[globalFunc]["varT"]:
+      return 1
+    else:
+      raise NameError("variable does not exists")
 
   def show(self):
     print(varTable)

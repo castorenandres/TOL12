@@ -53,12 +53,20 @@ Septimo avance:
     Se implementaron cuadruplos para expresiones y para estatutos lineales, falta ponerlo con direcciones de memoria.
     Cambio de llaves en las estructuras de las tablas de funciones y variables.
     Diseñando la division para reglas gramaticales para funciones y llamadas a funcion.
+    generando metodos y estructuras que se utilizaran para los cuadruplos de funciones y sus llamadas.
+    Se implementaron cuadruplos para funciones, falta ponerlo con direcciones de memoria.
+
+Octavo avance:
+    Se implementaron cuadruplos para llamadas, falta ponerlo con direcciones de memoria.
+    Diseñando las direcciones para los cuadruplos.
+    diseño de tabla de constantes
+    implementar tabla de constantes
+    Agregar direcciones para cuadruplos.
+    Agregar funcion de fill de cuadruplos
 
     Haciendo:
-    generando metodos y estructuras que se utilizaran para los cuadruplos de funciones y sus llamadas.
+    Diseñar la memoria y sus metodos
 
     Pendiente:
-    Se implementaron cuadruplos para funciones y llamadas, falta ponerlo con direcciones de memoria.
-    Diseñando las direcciones para los cuadruplos
-    Pensando como diseñar la memoria
-    Viendo como se hace la maquina virtual
+    Implementar memoria
+    Empezar la maquina virtual
