@@ -1075,9 +1075,26 @@ class TheOnlyLonelyParser(Parser):
             self.poper.append(4)
         return p
 
-    @_('factor2', 'factor7', 'factor8', 'factor9', 'factor10')
+    @_('')
+    def handleNegative(self, p):
+        print("entra handleNegative")
+        self.sign = -1
+        pass
+    
+    @_('')
+    def revertSign(self, p):
+        print("entra revertSign")
+        self.sign = 1
+        pass
+
+    @_('factor2', 'factor9', 'factor10', 'MINUS handleNegative factor11 revertSign', 'factor11')
     def factor(self, p):
         print("entra factor")
+        return p
+
+    @_('factor7', 'factor8')
+    def factor11(self, p):
+        print("entra factor11")
         return p
 
     @_('factor3 factor4')
@@ -1110,15 +1127,16 @@ class TheOnlyLonelyParser(Parser):
     @_('CTEI')
     def factor7(self, p):
         print("entra factor7")
-        isCTEI = constantTable.searchConstant(p.CTEI)
+        number = int(p.CTEI) * self.sign
+        sNumber = str(number)
+        isCTEI = constantTable.searchConstant(sNumber)
         if isCTEI == 0:
-            number = p.CTEI * self.sign
-            constantTable.addConstant(number, self.intC)
+            constantTable.addConstant(sNumber, self.intC)
             self.pilaO.append(self.intC)
             self.pTypes.append(1)
             self.intC = self.intC + 1
         elif isCTEI == 1:
-            dirC = constantTable.getDir(p.CTEI)
+            dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
             self.pTypes.append(1)
         
@@ -1127,14 +1145,16 @@ class TheOnlyLonelyParser(Parser):
     @_('CTEF')
     def factor8(self, p):
         print("entra factor8")
-        isCTEF = constantTable.searchConstant(p.CTEF)
+        number = float(p.CTEF) * self.sign
+        sNumber = str(number)
+        isCTEF = constantTable.searchConstant(sNumber)
         if isCTEF == 0:
-            constantTable.addConstant(p.CTEF, self.floatC)
+            constantTable.addConstant(sNumber, self.floatC)
             self.pilaO.append(self.floatC)
             self.pTypes.append(2)
             self.floatC = self.floatC + 1
         elif isCTEF == 1:
-            dirC = constantTable.getDir(p.CTEF)
+            dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
             self.pTypes.append(2)
         return p
@@ -1161,16 +1181,6 @@ class TheOnlyLonelyParser(Parser):
     def factor10(self, p):
         print("entra factor10")
         return p
-
-    @_('')
-    def handleNegative(self, p):
-        self.sign = -1
-        pass
-    
-    @_('')
-    def revertSign(self, p):
-        self.sign = 1
-        pass
 
 # main
 if __name__ == '__main__':
