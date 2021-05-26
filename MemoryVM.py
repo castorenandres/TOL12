@@ -1,18 +1,3 @@
-# contadores para direcciones
-    # GLOBALES
-        # intG:      1,000 - 1,999
-        # tempiG:    2,000 - 2,999
-        # floatG:    3,000 - 3,999
-        # tempfG:    4,000 - 4,999
-    # LOCALES
-        # intL:     5,000 - 5,999
-        # tempiL:   6,000 - 6,999
-        # floatL:   7,000 - 7,999
-        # tempfL:   8,000 - 8,999
-    # CONSTANTES
-        # intC:         9,000 - 9,999
-        # floatC:       10,000 - 10,999
-        # stringC:      11,000 - 11,999
 from collections import deque
 
 class GlobalMemory:
@@ -31,9 +16,9 @@ class GlobalMemory:
             if address >= 11000:
                 self.globalMemory["stringC"][address] = value
             elif address >= 10000:
-                self.globalMemory["floatC"][address] = value
+                self.globalMemory["floatC"][address] = float(value)
             elif address >= 9000:
-                self.globalMemory["intC"][address] = value
+                self.globalMemory["intC"][address] = int(value)
         else:
             raise ValueError("Address is not a constant")
 

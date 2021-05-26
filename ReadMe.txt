@@ -64,10 +64,10 @@ Octavo avance:
     Agregar direcciones para cuadruplos.
     Agregar funcion de fill de cuadruplos
     Crear metodos que regresen las tablas
+    Diseñar la memoria y sus metodos
+    Implementar memoria
 
     Haciendo:
-    Diseñar la memoria y sus metodos
+    Empezar la maquina virtual
 
     Pendiente:
-    Implementar memoria
-    Empezar la maquina virtual

@@ -4,6 +4,7 @@ from collections import deque
 from funcAndVarTable import FuncTable
 from funcAndVarTable import VarTable
 from constantTable import ConstantTable
+from virtualMachine import VirtualMachine
 
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
@@ -175,13 +176,6 @@ class TheOnlyLonelyParser(Parser):
     @_('programa5 programa4 ";" programa2 programa3 principal')
     def programa(self, p):
         print("entra programa")
-        fTable = functTable.getTable()
-        print(fTable)
-        print("\n")
-        cTable = constantTable.getTable()
-        print(cTable)
-        print("\n")
-        print(self.quadruples)
         pass
 
     @_('PROGRAM')
@@ -1168,13 +1162,6 @@ class TheOnlyLonelyParser(Parser):
             t_address = self.getType(address)
             self.pilaO.append(address)
             self.pTypes.append(t_address)
-            # if t_address == 1:
-            #     self.pTypes.append(1)
-            # elif t_address == 2:
-            #     self.pTypes.append(2)
-            # else:
-            #     raise TypeError("Type does not exists")
-            
         return p
 
     @_('llamada')
@@ -1201,3 +1188,9 @@ if __name__ == '__main__':
     print(result)
 
     file.close()
+
+    # pass tables to virtual machine
+    vm = VirtualMachine()
+    fTable = functTable.getTable()
+    cTable = constantTable.getTable()
+    vm.startProgram(parser.quadruples, fTable, cTable)
