@@ -174,8 +174,12 @@ class TheOnlyLonelyParser(Parser):
     @_('programa5 programa4 ";" programa2 programa3 principal')
     def programa(self, p):
         print("entra programa")
-        print(functTable.show())
-        print(constantTable.show())
+        fTable = functTable.getTable()
+        print(fTable)
+        print("\n")
+        cTable = constantTable.getTable()
+        print(cTable)
+        print("\n")
         print(self.quadruples)
         pass
 

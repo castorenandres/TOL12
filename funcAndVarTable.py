@@ -89,6 +89,9 @@ class FuncTable():
     else:
       raise NameError("Function name does not exists")
 
+  def getTable (self):
+    return funcTable
+
   def show(self):
     print(funcTable)
 

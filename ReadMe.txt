@@ -63,6 +63,7 @@ Octavo avance:
     implementar tabla de constantes
     Agregar direcciones para cuadruplos.
     Agregar funcion de fill de cuadruplos
+    Crear metodos que regresen las tablas
 
     Haciendo:
     Diseñar la memoria y sus metodos
