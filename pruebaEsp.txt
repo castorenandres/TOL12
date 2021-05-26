@@ -3,6 +3,11 @@ variables
     x, i : int;
     y, resultado : float;
 
+void function escribir ();
+{
+    write("Hola mundo!");
+}
+
 int function sumar (int x, int y);
 {
     x = x + 5;
@@ -18,11 +23,17 @@ int function sumar (int x, int y);
     return (x + y);
 }
 
+float function multi ();
+{
+    return (x * i);
+}
+
 principal() {
     x = 5;
     y = 6.3;
 
-    sumar(x, y);
+    escribir();
+    sumar(x, x + 1);
     
     from i = 0 to x + 4 do {
         pendown();

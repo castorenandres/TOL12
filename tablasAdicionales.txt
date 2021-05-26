@@ -15,12 +15,11 @@ Codigo numerico para operaciones de cuadruplos
 30 -> goto
 31 -> gotoF
 32 -> gotoV
-33 -> fill
-34 -> ERA
-35 -> Param
-36 -> goSub
-37 -> EndFunc
-38 -> End
+33 -> ERA
+34 -> Param
+35 -> goSub
+36 -> EndFunc
+37 -> End
 
 codigo numerico para funciones predefinidas:
 100 -> return

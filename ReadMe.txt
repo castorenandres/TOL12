@@ -59,12 +59,14 @@ Septimo avance:
 Octavo avance:
     Se implementaron cuadruplos para llamadas, falta ponerlo con direcciones de memoria.
     Diseñando las direcciones para los cuadruplos.
-
-    Haciendo:
-    Agregar direcciones para cuadruplos.
-
-    Pendiente:
     diseño de tabla de constantes
     implementar tabla de constantes
-    Pensando como diseñar la memoria
-    Viendo como se hace la maquina virtual
+    Agregar direcciones para cuadruplos.
+    Agregar funcion de fill de cuadruplos
+
+    Haciendo:
+    Diseñar la memoria y sus metodos
+
+    Pendiente:
+    Implementar memoria
+    Empezar la maquina virtual
