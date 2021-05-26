@@ -22,6 +22,7 @@ class TheOnlyLonelyParser(Parser):
     paramPointer = 0
     vControl = 0
     vFinal = 0
+    sign = 1
     paramTypes = []
     quadruples = {}
     idStack = deque()
@@ -1111,7 +1112,8 @@ class TheOnlyLonelyParser(Parser):
         print("entra factor7")
         isCTEI = constantTable.searchConstant(p.CTEI)
         if isCTEI == 0:
-            constantTable.addConstant(p.CTEI, self.intC)
+            number = p.CTEI * self.sign
+            constantTable.addConstant(number, self.intC)
             self.pilaO.append(self.intC)
             self.pTypes.append(1)
             self.intC = self.intC + 1
@@ -1159,6 +1161,16 @@ class TheOnlyLonelyParser(Parser):
     def factor10(self, p):
         print("entra factor10")
         return p
+
+    @_('')
+    def handleNegative(self, p):
+        self.sign = -1
+        pass
+    
+    @_('')
+    def revertSign(self, p):
+        self.sign = 1
+        pass
 
 # main
 if __name__ == '__main__':
