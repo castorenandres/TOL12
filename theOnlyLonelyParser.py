@@ -405,14 +405,14 @@ class TheOnlyLonelyParser(Parser):
             top = self.poper[len(self.poper)-1]
             # codes: 11 -> =
             if top == 11:
-                right = self.pilaO.pop()
-                t_right = self.pTypes.pop()
                 res = self.pilaO.pop()
                 t_res = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
                 op = self.poper.pop()
-                t_asign = self.semantics(t_res, t_right, op)
+                t_asign = self.semantics(t_left, t_res, op)
                 if t_asign != -1:
-                    self.generateQuad(op, right, None, res)
+                    self.generateQuad(op, res, None, left)
                 else:
                     raise TypeError("type mismatch")
         else:
@@ -591,14 +591,14 @@ class TheOnlyLonelyParser(Parser):
         end = self.pJumps.pop()
         ret = self.pJumps.pop()
         # codes: 30 -> goto
-        self.generateQuad(30, ret, None, None)
+        self.generateQuad(30, None, None, ret)
         self.fillQuadruple(end, self.quadCount)
         return p
 
     @_('WHILE')
     def ciclow2(self, p):
         print("entra ciclow2")
-        self.pJumps.append(self.quadCount)
+        self.pJumps.append(self.quadCount - 1)
         return p
 
     @_('"(" expresion ")"')
@@ -617,13 +617,28 @@ class TheOnlyLonelyParser(Parser):
     @_('FROM ciclof2 ASSIGN ciclof3 ciclof4 bloque')
     def ciclof(self, p):
         print("entra ciclof")
-        # codes: 1 -> +
+        isCTEI = constantTable.searchConstant("1")
+        if isCTEI == 0:
+            constantTable.addConstant("1", self.intC)
+            self.pilaO.append(self.intC)
+            self.pTypes.append(1)
+            self.intC = self.intC + 1
+        elif isCTEI == 1:
+            dirC = constantTable.getDir("1")
+            self.pilaO.append(dirC)
+            self.pTypes.append(1)
+
+        one = self.pilaO.pop()
+        self.pTypes.pop()
         if len(self.funcNames) > 0:
             # Local
-            self.generateQuad(1, self.vControl, 1, self.tempiL)
+            # codes: 1 -> +
+            self.generateQuad(1, self.vControl, one, self.tempiL)
+            self.generateQuad(11, self.tempiL, None, self.vControl)
             self.tempiL = self.tempiL + 1
         else: # Global
-            self.generateQuad(1, self.vControl, 1, self.tempiG)
+            self.generateQuad(1, self.vControl, one, self.tempiG)
+            self.generateQuad(11, self.tempiG, None, self.vControl)
             self.tempiG = self.tempiG + 1
 
         end = self.pJumps.pop()
@@ -1171,7 +1186,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("pruebaEsp.txt", 'r')
+    file = open("pruebaVM.txt", 'r')
 
     allLines = ""
     for line in file:

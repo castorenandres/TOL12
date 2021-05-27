@@ -12,7 +12,7 @@ class GlobalMemory:
     }
 
     def setConstants(self, address, value):
-        if address < 12000 or address >= 9000:
+        if address < 12000 and address >= 9000:
             if address >= 11000:
                 self.globalMemory["stringC"][address] = value
             elif address >= 10000:
@@ -38,8 +38,8 @@ class GlobalMemory:
         else:
             raise ValueError("Address is not a temporal variable")
 
-    def __getType(self, address):
-        if address < 12000 or address >= 1000:
+    def getType(self, address):
+        if address < 12000 and address >= 1000:
             if address >= 11000:
                 return "stringC"
             elif address >= 10000:
@@ -60,14 +60,14 @@ class GlobalMemory:
             raise ValueError("Address not found")
 
     def updateMemory(self, address, value):
-        typeAddress = self.__getType(address)
+        typeAddress = self.getType(address)
         if address in self.globalMemory[typeAddress]:
             self.globalMemory[typeAddress][address] = value
         else:
             raise IndexError("Address does not exists")
         
     def getValue(self, address):
-        typeAddress = self.__getType(address)
+        typeAddress = self.getType(address)
         
         if address in self.globalMemory[typeAddress]:
             if self.globalMemory[typeAddress][address] == None:
@@ -76,6 +76,12 @@ class GlobalMemory:
                 return self.globalMemory[typeAddress][address]
         else:
             raise IndexError("Address does not exists")
+
+    def isDir(self, address):
+        for key in self.globalMemory:
+            if address in self.globalMemory[key]:
+                return 1
+        return 0
 
     def show(self):
         print(self.globalMemory)
@@ -137,7 +143,7 @@ class LocalMemory:
         else:
             raise IndexError("Parameter does not exists")
 
-    def __getType(self, address):
+    def getType(self, address):
         if address < 9000 or address >= 5000:
             if address >= 8000:
                 return "tempf"
@@ -151,14 +157,14 @@ class LocalMemory:
             raise ValueError("Address not found")
 
     def updateLocalMemory(self, address, value):
-        typeAddress = self.__getType(address)
+        typeAddress = self.getType(address)
         if address in self.localMemory[typeAddress]:
             self.localMemory[typeAddress][address] = value
         else:
             raise IndexError("Local address does not exists")
 
     def getLocalValue(self, address):
-        typeAddress = self.__getType(address)
+        typeAddress = self.getType(address)
         
         if address in self.localMemory[typeAddress]:
             if self.localMemory[typeAddress][address] == None:
