@@ -458,11 +458,24 @@ class TheOnlyLonelyParser(Parser):
         self.poper.append(11)
         return p
 
-    @_('llamada2 llamada3 llamada4 llamada7 ";"')
+    @_('llamada2 llamada3 llamada4 llamada7')
     def llamada(self, p):
         print("entra llamada")
         # codes: 35 -> goSub
         self.generateQuad(35, None, None, self.tempFuncCall)
+        t_llamada = functTable.getType(self.tempFuncCall)
+        # si es int o float tiene retorno
+        if t_llamada == 1 or t_llamada == 2:
+            # si no hay recursion
+            varFunc = self.tempFuncCall + "Value"
+            print("varFunc: ", varFunc)
+            varFuncDir = varTable.getDir(varFunc, self.programName, self.programName)
+            print("varFuncDir: ", varFuncDir)
+            t_varFunc = self.getType(varFuncDir)
+            self.pilaO.append(varFuncDir)
+            self.pTypes.append(t_varFunc)
+            print(self.pilaO)
+            print(self.poper)
         return p
 
     @_('ID')
@@ -533,7 +546,10 @@ class TheOnlyLonelyParser(Parser):
                 else:
                     raise TypeError("Type mismatch")
             else:
-                self.generateQuad(100, None, None, res)
+                if (t_res == 1 or t_res == 2):
+                    self.generateQuad(100, None, None, res)
+                else:
+                    raise TypeError("Type mismatch")
         else:
             raise TypeError("Void function does not use return")
             
@@ -1290,6 +1306,10 @@ if __name__ == '__main__':
     print(result)
 
     file.close()
+
+    # print(functTable.show())
+    # print(constantTable.show())
+    print(parser.quadruples)
 
     # pass tables to virtual machine
     vm = VirtualMachine()

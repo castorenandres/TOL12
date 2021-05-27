@@ -1,0 +1,24 @@
+program FibonacciRecursive;
+variables
+    fibo : int;
+
+int function fibonacci (int n);
+{
+    if (n < 0) then {
+        write("No existe");
+    } else {
+        if (n == 0) then {
+            return (0);
+        } else {
+            if (n == 1 | n == 2) then {
+                return (1);
+            } else {
+                return (fibonacci(n - 1) + fibonacci(n - 2));
+            }
+        }
+    }
+}
+
+principal() {
+    fibo = fibonacci(9);
+}
