@@ -4,6 +4,7 @@ from collections import deque
 from funcAndVarTable import FuncTable
 from funcAndVarTable import VarTable
 from constantTable import ConstantTable
+from virtualMachine import VirtualMachine
 
 class TheOnlyLonelyParser(Parser):
     tokens = TheOnlyLonelyLexer.tokens
@@ -22,6 +23,7 @@ class TheOnlyLonelyParser(Parser):
     paramPointer = 0
     vControl = 0
     vFinal = 0
+    sign = 1
     paramTypes = []
     quadruples = {}
     idStack = deque()
@@ -34,10 +36,10 @@ class TheOnlyLonelyParser(Parser):
 
     # contadores para direcciones
     # GLOBALES
-    # intG:      1,000 - 1,999
-    # tempiG:    2,000 - 2,999
-    # floatG:    3,000 - 3,999
-    # tempfG:    4,000 - 4,999
+        # intG:      1,000 - 1,999
+        # tempiG:    2,000 - 2,999
+        # floatG:    3,000 - 3,999
+        # tempfG:    4,000 - 4,999
     
     intG = 1000
     tempiG = 2000
@@ -45,10 +47,10 @@ class TheOnlyLonelyParser(Parser):
     tempfG = 4000
 
     # LOCALES
-    # intL:     5,000 - 5,999
-    # tempiL:   6,000 - 6,999
-    # floatL:   7,000 - 7,999
-    # tempfL:   8,000 - 8,999
+        # intL:     5,000 - 5,999
+        # tempiL:   6,000 - 6,999
+        # floatL:   7,000 - 7,999
+        # tempfL:   8,000 - 8,999
     
     intL = 5000
     tempiL = 6000
@@ -56,9 +58,9 @@ class TheOnlyLonelyParser(Parser):
     tempfL = 8000
 
     # CONSTANTES
-    # intC:         9,000 - 9,999
-    # floatC:       10,000 - 10,999
-    # stringC:      11,000 - 11,999
+        # intC:         9,000 - 9,999
+        # floatC:       10,000 - 10,999
+        # stringC:      11,000 - 11,999
 
     intC = 9000
     floatC = 10000
@@ -174,9 +176,6 @@ class TheOnlyLonelyParser(Parser):
     @_('programa5 programa4 ";" programa2 programa3 principal')
     def programa(self, p):
         print("entra programa")
-        print(functTable.show())
-        print(constantTable.show())
-        print(self.quadruples)
         pass
 
     @_('PROGRAM')
@@ -406,14 +405,14 @@ class TheOnlyLonelyParser(Parser):
             top = self.poper[len(self.poper)-1]
             # codes: 11 -> =
             if top == 11:
-                right = self.pilaO.pop()
-                t_right = self.pTypes.pop()
                 res = self.pilaO.pop()
                 t_res = self.pTypes.pop()
+                left = self.pilaO.pop()
+                t_left = self.pTypes.pop()
                 op = self.poper.pop()
-                t_asign = self.semantics(t_res, t_right, op)
+                t_asign = self.semantics(t_left, t_res, op)
                 if t_asign != -1:
-                    self.generateQuad(op, right, None, res)
+                    self.generateQuad(op, res, None, left)
                 else:
                     raise TypeError("type mismatch")
         else:
@@ -592,14 +591,14 @@ class TheOnlyLonelyParser(Parser):
         end = self.pJumps.pop()
         ret = self.pJumps.pop()
         # codes: 30 -> goto
-        self.generateQuad(30, ret, None, None)
+        self.generateQuad(30, None, None, ret)
         self.fillQuadruple(end, self.quadCount)
         return p
 
     @_('WHILE')
     def ciclow2(self, p):
         print("entra ciclow2")
-        self.pJumps.append(self.quadCount)
+        self.pJumps.append(self.quadCount - 1)
         return p
 
     @_('"(" expresion ")"')
@@ -618,13 +617,28 @@ class TheOnlyLonelyParser(Parser):
     @_('FROM ciclof2 ASSIGN ciclof3 ciclof4 bloque')
     def ciclof(self, p):
         print("entra ciclof")
-        # codes: 1 -> +
+        isCTEI = constantTable.searchConstant("1")
+        if isCTEI == 0:
+            constantTable.addConstant("1", self.intC)
+            self.pilaO.append(self.intC)
+            self.pTypes.append(1)
+            self.intC = self.intC + 1
+        elif isCTEI == 1:
+            dirC = constantTable.getDir("1")
+            self.pilaO.append(dirC)
+            self.pTypes.append(1)
+
+        one = self.pilaO.pop()
+        self.pTypes.pop()
         if len(self.funcNames) > 0:
             # Local
-            self.generateQuad(1, self.vControl, 1, self.tempiL)
+            # codes: 1 -> +
+            self.generateQuad(1, self.vControl, one, self.tempiL)
+            self.generateQuad(11, self.tempiL, None, self.vControl)
             self.tempiL = self.tempiL + 1
         else: # Global
-            self.generateQuad(1, self.vControl, 1, self.tempiG)
+            self.generateQuad(1, self.vControl, one, self.tempiG)
+            self.generateQuad(11, self.tempiG, None, self.vControl)
             self.tempiG = self.tempiG + 1
 
         end = self.pJumps.pop()
@@ -1070,9 +1084,26 @@ class TheOnlyLonelyParser(Parser):
             self.poper.append(4)
         return p
 
-    @_('factor2', 'factor7', 'factor8', 'factor9', 'factor10')
+    @_('')
+    def handleNegative(self, p):
+        print("entra handleNegative")
+        self.sign = -1
+        pass
+    
+    @_('')
+    def revertSign(self, p):
+        print("entra revertSign")
+        self.sign = 1
+        pass
+
+    @_('factor2', 'factor9', 'factor10', 'MINUS handleNegative factor11 revertSign', 'factor11')
     def factor(self, p):
         print("entra factor")
+        return p
+
+    @_('factor7', 'factor8')
+    def factor11(self, p):
+        print("entra factor11")
         return p
 
     @_('factor3 factor4')
@@ -1105,14 +1136,16 @@ class TheOnlyLonelyParser(Parser):
     @_('CTEI')
     def factor7(self, p):
         print("entra factor7")
-        isCTEI = constantTable.searchConstant(p.CTEI)
+        number = int(p.CTEI) * self.sign
+        sNumber = str(number)
+        isCTEI = constantTable.searchConstant(sNumber)
         if isCTEI == 0:
-            constantTable.addConstant(p.CTEI, self.intC)
+            constantTable.addConstant(sNumber, self.intC)
             self.pilaO.append(self.intC)
             self.pTypes.append(1)
             self.intC = self.intC + 1
         elif isCTEI == 1:
-            dirC = constantTable.getDir(p.CTEI)
+            dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
             self.pTypes.append(1)
         
@@ -1121,14 +1154,16 @@ class TheOnlyLonelyParser(Parser):
     @_('CTEF')
     def factor8(self, p):
         print("entra factor8")
-        isCTEF = constantTable.searchConstant(p.CTEF)
+        number = float(p.CTEF) * self.sign
+        sNumber = str(number)
+        isCTEF = constantTable.searchConstant(sNumber)
         if isCTEF == 0:
-            constantTable.addConstant(p.CTEF, self.floatC)
+            constantTable.addConstant(sNumber, self.floatC)
             self.pilaO.append(self.floatC)
             self.pTypes.append(2)
             self.floatC = self.floatC + 1
         elif isCTEF == 1:
-            dirC = constantTable.getDir(p.CTEF)
+            dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
             self.pTypes.append(2)
         return p
@@ -1142,13 +1177,6 @@ class TheOnlyLonelyParser(Parser):
             t_address = self.getType(address)
             self.pilaO.append(address)
             self.pTypes.append(t_address)
-            # if t_address == 1:
-            #     self.pTypes.append(1)
-            # elif t_address == 2:
-            #     self.pTypes.append(2)
-            # else:
-            #     raise TypeError("Type does not exists")
-            
         return p
 
     @_('llamada')
@@ -1158,7 +1186,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("pruebaEsp.txt", 'r')
+    file = open("pruebaVM.txt", 'r')
 
     allLines = ""
     for line in file:
@@ -1175,3 +1203,9 @@ if __name__ == '__main__':
     print(result)
 
     file.close()
+
+    # pass tables to virtual machine
+    vm = VirtualMachine()
+    fTable = functTable.getTable()
+    cTable = constantTable.getTable()
+    vm.startProgram(parser.quadruples, fTable, cTable)

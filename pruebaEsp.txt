@@ -13,6 +13,8 @@ int function sumar (int x, int y);
     x = x + 5;
     y = y / 2;
 
+    x = -5;
+
     if (x < y | x != 1) then {
         y = x;
     } else {
@@ -29,15 +31,15 @@ float function multi ();
 }
 
 principal() {
-    x = 5;
-    y = 6.3;
+    x = -5;
+    y = -6.3;
 
     escribir();
     sumar(x, x + 1);
     
     from i = 0 to x + 4 do {
         pendown();
-        y = y * 2;
+        y = y * 2.5;
         write(i);
         width(i + 4);
         color(23, 42, 12 + i);

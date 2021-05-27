@@ -24,6 +24,9 @@ class ConstantTable:
             return 1
         else:
             return 0
+
+    def getTable(self):
+        return constantTable
     
     def show(self):
         global constantTable
