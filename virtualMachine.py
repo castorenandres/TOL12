@@ -370,10 +370,16 @@ class VirtualMachine:
             elif self.op == 33: # ERA
                 # para recursividad, checar que prevMemoryL este vacio o si tienes funciones dentro
                 # checar que se pueda trabajar con dos memorias
-                parami, paramf, vari, varf, tempi, tempf = self.breakFunctionSizes(self.res)
-                self.funcName = self.res
-                memoryL = LocalMemory(parami, paramf, vari, varf, tempi, tempf)
-                self.prevInstruction.append(self.instruction)
+                if len(self.prevFunc) > 0:
+                    # recursion?
+                    print("recursion")
+                    
+                else:
+                    parami, paramf, vari, varf, tempi, tempf = self.breakFunctionSizes(self.res)
+                    self.funcName = self.res
+                    memoryL = LocalMemory(parami, paramf, vari, varf, tempi, tempf)
+                    self.prevFunc.append(self.funcName)
+                    self.prevInstruction.append(self.instruction)
             elif self.op == 34: # PARAM
                 # para recursividad, checar que prevMemoryL este vacio o si tienes funciones dentro
                 # checar que se pueda trabajar con dos memorias
