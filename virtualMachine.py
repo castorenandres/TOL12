@@ -283,7 +283,10 @@ class VirtualMachine:
                     memoryL.updateLocalMemory(self.res, leftSide)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
-                    self.memoryG.updateMemory(self.res, leftSide)
+                    if self.res >= 2000 and self.res < 3000 or self.res >= 4000 and self.res < 5000:
+                        self.memoryG.setTempVariables(self.res, leftSide)
+                    else:
+                        self.memoryG.updateMemory(self.res, leftSide)
             
             # Pre-define functions
             # read and write

@@ -466,16 +466,46 @@ class TheOnlyLonelyParser(Parser):
         t_llamada = functTable.getType(self.tempFuncCall)
         # si es int o float tiene retorno
         if t_llamada == 1 or t_llamada == 2:
-            # si no hay recursion
+            # variable global de la funcion
             varFunc = self.tempFuncCall + "Value"
             print("varFunc: ", varFunc)
             varFuncDir = varTable.getDir(varFunc, self.programName, self.programName)
             print("varFuncDir: ", varFuncDir)
             t_varFunc = self.getType(varFuncDir)
-            self.pilaO.append(varFuncDir)
-            self.pTypes.append(t_varFunc)
-            print(self.pilaO)
-            print(self.poper)
+            if len(self.funcNames) > 0:
+                # es local
+                if t_varFunc == 1:
+                    if self.tempiL >= 6000 and self.tempiL < 7000:
+                            res = self.tempiL
+                            self.tempiL = self.tempiL + 1
+                            self.contTempi = self.contTempi + 1
+                    else:
+                        raise OverflowError("Memory overflow")
+                else:
+                    if self.tempfL >= 8000 and self.tempfL < 9000:
+                        res = self.tempfL
+                        self.tempfL = self.tempfL + 1
+                        self.contTempf = self.contTempf + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+            else:
+                # Guardar en temporal falta
+                if t_varFunc == 1:
+                    if self.tempiG >= 2000 and self.tempiG < 3000:
+                        res = self.tempiG
+                        self.tempiG = self.tempiG + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+                else:
+                    if self.tempfG >= 4000 and self.tempfG < 5000:
+                        res = self.tempfG
+                        self.tempfG = self.tempfG + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+                
+                self.generateQuad(11, varFuncDir, None, res)
+                self.pilaO.append(res)
+                self.pTypes.append(t_varFunc)
         return p
 
     @_('ID')
@@ -1015,7 +1045,7 @@ class TheOnlyLonelyParser(Parser):
                     raise TypeError("type mismatch")
         return p
 
-    @_('expA4 expA', '')
+    @_('expA4 expB', '')
     def expA3(self, p):
         print("entra expA3")
         return p
@@ -1308,7 +1338,7 @@ if __name__ == '__main__':
     file.close()
 
     # print(functTable.show())
-    # print(constantTable.show())
+    print(constantTable.show())
     print(parser.quadruples)
 
     # pass tables to virtual machine

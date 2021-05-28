@@ -10,6 +10,7 @@ float function sumar (int x, float y);
 
 void function escribir ();
 {
+    arc(50, 180);
     write("Hola mundo!");
 }
 
