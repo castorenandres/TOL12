@@ -4,13 +4,16 @@ from collections import deque
 from typing import Type
 from MemoryVM import GlobalMemory
 from MemoryVM import LocalMemory
+from copy import deepcopy
+
 class VirtualMachine:
     memoryG = GlobalMemory()
     constantTable = {}
     funcTable = {}
     instruction = 1
     prevInstruction = deque()
-    prevMemoryL = deque['LocalMemory']()
+    isAsleep = False
+    prevMemoryL = []
     funcName = ''
     prevFunc = deque()
     # quadruples parts
@@ -93,196 +96,308 @@ class VirtualMachine:
             if self.op == 1: # +
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    result = leftSide + rightSide
-                    memoryL.updateLocalMemory(self.res, result)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
+                    else:
+                        rightSide = memoryL.getLocalValue(self.right)
+                    
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    result = leftSide + rightSide
+                    
+                result = leftSide + rightSide
+
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
+                    else:
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 2: # -
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    result = leftSide - rightSide
-                    memoryL.updateLocalMemory(self.res, result)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
+                    else:
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    result = leftSide - rightSide
+                    
+                result = leftSide - rightSide
+
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
+                    else:
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 3: # *
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    result = leftSide * rightSide
-                    memoryL.updateLocalMemory(self.res, result)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
+                    else:
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    result = leftSide * rightSide
+                    
+                result = leftSide * rightSide
+
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
+                    else:
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 4: # /
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    result = leftSide / rightSide
-                    memoryL.updateLocalMemory(self.res, result)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
+                    else:
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    result = leftSide / rightSide
+                    
+                result = leftSide / rightSide
+
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
+                    else:
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 5: # ==
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide == rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide == rightSide:
-                        result = 1
+                    
+                if leftSide == rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 6: # !=
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide != rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide != rightSide:
-                        result = 1
+                    
+                if leftSide != rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 7: # >
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide > rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide > rightSide:
-                        result = 1
+                    
+                if leftSide > rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 8: # <
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide < rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide < rightSide:
-                        result = 1
+                    
+                if leftSide < rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 9: # &
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide and rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide and rightSide:
-                        result = 1
+                
+                if leftSide and rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 10: # |
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
 
                 if self.right >= 5000 and self.right < 9000:
-                    rightSide = memoryL.getLocalValue(self.right)
-                    if leftSide or rightSide:
-                        result = 1
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        rightSide = tempMemoryL.getLocalValue(self.right)
                     else:
-                        result = 0
-                    memoryL.updateLocalMemory(self.res, result)
+                        rightSide = memoryL.getLocalValue(self.right)
                 else:
                     rightSide = self.memoryG.getValue(self.right)
-                    if leftSide or rightSide:
-                        result = 1
+
+                if leftSide or rightSide:
+                    result = 1
+                else:
+                    result = 0
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
                     else:
-                        result = 0
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     self.memoryG.setTempVariables(self.res, result)
             elif self.op == 11: # =
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
-                    leftSide = memoryL.getLocalValue(self.left)
-                    memoryL.updateLocalMemory(self.res, leftSide)
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        leftSide = tempMemoryL.getLocalValue(self.left)
+                    else:
+                        leftSide = memoryL.getLocalValue(self.left)
                 else:
                     leftSide = self.memoryG.getValue(self.left)
+                
+                if self.res >= 5000 and self.res < 9000:
+                    if len(self.prevMemoryL) > 1 and not self.isAsleep:
+                        tempMemoryL.updateLocalMemory(self.res, result)
+                    else:
+                        memoryL.updateLocalMemory(self.res, result)
+                else:
                     if self.res >= 2000 and self.res < 3000 or self.res >= 4000 and self.res < 5000:
                         self.memoryG.setTempVariables(self.res, leftSide)
                     else:
@@ -300,7 +415,13 @@ class VirtualMachine:
 
                 if self.res >= 5000 and self.res < 9000:
                     # local variable
-                    # t_res = getType
+                    t_res = memoryL.getType(self.res)
+                    if t_res == "int" and type(result) == int:
+                        memoryL.updateLocalMemory(self.res, result)
+                    elif t_res == "float" and type(result) == float:
+                        memoryL.updateLocalMemory(self.res, result)
+                    else:
+                        raise TypeError("Input and variable type do not match")
                     print("local variable")
                 else:
                     t_res = self.memoryG.getType(self.res)
@@ -310,8 +431,6 @@ class VirtualMachine:
                         self.memoryG.updateMemory(self.res, result)
                     else:
                         raise TypeError("Input and variable type do not match")
-
-                # self.memoryG.show()
             elif self.op == 102:
                 if self.res >= 11000 and self.res < 12000:
                     result = self.memoryG.getValue(self.res)
@@ -356,50 +475,73 @@ class VirtualMachine:
             elif self.op == 111:
                 self.trt.clear()
 
-            # condicionales y ciclos
+            # conditionals and loops
             elif self.op == 30:
                 self.instruction = self.res - 1
             elif self.op == 31:
-                if self.memoryG.getValue(self.left) == 0:
-                    self.instruction = self.res - 1
+                if self.left >= 5000 and self.left < 9000:
+                    if memoryL.getLocalValue(self.left) == 0:
+                        self.instruction = self.res - 1
+                else:
+                    if self.memoryG.getValue(self.left) == 0:
+                        self.instruction = self.res - 1
             elif self.op == 32:
-                if self.memoryG.getValue(self.left) == 1:
-                    self.instruction = self.res - 1
+                if self.left >= 5000 and self.left < 9000:
+                    if memoryL.getLocalValue(self.left) == 1:
+                        self.instruction = self.res - 1
+                else:
+                    if self.memoryG.getValue(self.left) == 1:
+                        self.instruction = self.res - 1
 
-            # funciones
+            # functions
             elif self.op == 33: # ERA
-                # para recursividad, checar que prevMemoryL este vacio o si tienes funciones dentro
-                # checar que se pueda trabajar con dos memorias
-                if len(self.prevFunc) > 0:
-                    # recursion?
-                    print("recursion")
-                    
+                if self.funcName != '':
+                    # More than one local memory
+                    tempMemoryL = self.prevMemoryL[len(self.prevMemoryL) - 1]
+                    self.prevFunc.append(self.res)
+                    parami, paramf, vari, varf, tempi, tempf = self.breakFunctionSizes(self.res)
+                    self.funcName = self.res
+                    self.prevMemoryL.append(LocalMemory(parami, paramf, vari, varf, tempi, tempf))
+                    memoryL = self.prevMemoryL[len(self.prevMemoryL) - 1]
+                    self.isAsleep = False
                 else:
                     parami, paramf, vari, varf, tempi, tempf = self.breakFunctionSizes(self.res)
                     self.funcName = self.res
-                    memoryL = LocalMemory(parami, paramf, vari, varf, tempi, tempf)
-                    self.prevFunc.append(self.funcName)
-                    self.prevInstruction.append(self.instruction)
+                    self.prevMemoryL.append(LocalMemory(parami, paramf, vari, varf, tempi, tempf))
+                    memoryL = self.prevMemoryL[len(self.prevMemoryL) - 1]
             elif self.op == 34: # PARAM
-                # para recursividad, checar que prevMemoryL este vacio o si tienes funciones dentro
-                # checar que se pueda trabajar con dos memorias
                 if self.left >= 5000 and self.left < 9000:
-                    result = memoryL.getLocalValue(self.left)
+                    result = tempMemoryL.getLocalValue(self.left)
+                    self.isAsleep = True
                 else:
                     result = self.memoryG.getValue(self.left)
                 
                 memoryL.setParam(result)
-                memoryL.show()
+                # memoryL.show()
             elif self.op == 35: # GOSUB
                 funcDir = self.getFuncDir(self.res)
                 self.prevInstruction.append(self.instruction)
                 self.instruction = funcDir - 1
             elif self.op == 36: # ENDFUNC
-                del memoryL
-                # si prevMemoryL > 0 entonces pop de prevMemoryL para recursion
+                if len(self.prevMemoryL) >= 2:
+                    self.prevMemoryL.pop()
+                    memoryL = self.prevMemoryL[len(self.prevMemoryL) - 1]
+                    tempMemoryL = self.prevMemoryL[len(self.prevMemoryL) - 2]
+                    self.funcName = self.prevFunc.pop()
+                elif len(self.prevMemoryL) == 1:
+                    memoryL = self.prevMemoryL.pop()
+                    del tempMemoryL
+                else:
+                    del memoryL
+                    self.funcName = ''
+                
                 self.instruction = self.prevInstruction.pop()
             elif self.op == 100: # Return
-                result = memoryL.getLocalValue(self.res)
+                if self.res >= 5000 and self.res < 9000:
+                    result = memoryL.getLocalValue(self.res)
+                else:
+                    result = self.memoryG.getValue(self.res)
+                
                 retVariable = self.funcName + "Value"
                 retVariableDir = self.getGlobalVariableDir(retVariable)
 
@@ -410,5 +552,6 @@ class VirtualMachine:
             # print(self.instruction)
             self.instruction = self.instruction + 1
         turtle.done()
+        print('\n')
         self.memoryG.show()
         # print(quadruples)

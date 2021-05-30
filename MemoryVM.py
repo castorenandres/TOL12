@@ -87,20 +87,21 @@ class GlobalMemory:
         print(self.globalMemory)
 
 class LocalMemory:
-    intL = 5000
-    tempiL = 6000
-    floatL = 7000
-    tempfL = 8000
-    params = deque()
-    paramsType = deque()
-    localMemory = {
-        "int": {},
-        "tempi": {},
-        "float": {},
-        "tempf": {},
-    }
 
     def __init__(self, parami, paramf, vari, varf, tempi, tempf):
+        self.intL = 5000
+        self.tempiL = 6000
+        self.floatL = 7000
+        self.tempfL = 8000
+        self.params = deque()
+        self.paramsType = deque()
+        self.localMemory = {
+            "int": {},
+            "tempi": {},
+            "float": {},
+            "tempf": {},
+        }
+        
         if parami != 0:
             for i in range(parami):
                 self.localMemory["int"][self.intL] = None

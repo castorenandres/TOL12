@@ -503,9 +503,9 @@ class TheOnlyLonelyParser(Parser):
                     else:
                         raise OverflowError("Memort overflow")
                 
-                self.generateQuad(11, varFuncDir, None, res)
-                self.pilaO.append(res)
-                self.pTypes.append(t_varFunc)
+            self.generateQuad(11, varFuncDir, None, res)
+            self.pilaO.append(res)
+            self.pTypes.append(t_varFunc)
         return p
 
     @_('ID')
@@ -520,6 +520,7 @@ class TheOnlyLonelyParser(Parser):
     @_('"("')
     def llamada3(self, p):
         print("entra llamada3")
+        self.poper.append("(")
         # codes: 33 -> ERA
         self.generateQuad(33, None, None, self.tempFuncCall)
         self.paramPointer = 0
@@ -558,6 +559,7 @@ class TheOnlyLonelyParser(Parser):
     @_('")"')
     def llamada7(self, p):
         print("entra llamada7")
+        self.poper.pop()
         if len(self.paramTypes) > 0:
             if self.paramPointer + 1 != len(self.paramTypes):
                 raise IndexError("Number of parameters mismatch")
@@ -1045,7 +1047,7 @@ class TheOnlyLonelyParser(Parser):
                     raise TypeError("type mismatch")
         return p
 
-    @_('expA4 expB', '')
+    @_('expA4 expA', '')
     def expA3(self, p):
         print("entra expA3")
         return p
@@ -1074,6 +1076,7 @@ class TheOnlyLonelyParser(Parser):
         print("entra expB2")
         if len(self.poper) > 0:
             top = self.poper[len(self.poper)-1]
+            print("expB2 top: ", top)
             # codes: 1 -> +, 2 -> -
             if top == 1 or top == 2:
                 right = self.pilaO.pop()
@@ -1319,7 +1322,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("pruebaVM.txt", 'r')
+    file = open("fibonacciRec.txt", 'r')
 
     allLines = ""
     for line in file:

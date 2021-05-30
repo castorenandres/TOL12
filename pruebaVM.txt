@@ -3,22 +3,22 @@ variables
     x, i : int;
     y, resultado : float;
 
-float function sumar (int x, float y);
-{
-    return (x + y);
-}
-
 void function escribir ();
 {
     arc(50, 180);
     write("Hola mundo!");
 }
 
+float function sumar (int x, float y);
+{
+    escribir()
+    return (x + y);
+}
+
 principal() {
     x = 20;
     y = 5;
 
-    escribir()
     resultado = (sumar(x, y) + 5) * 2;
     write(resultado);
 }
