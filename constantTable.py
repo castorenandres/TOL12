@@ -1,6 +1,7 @@
 constantTable = {}
 
 class ConstantTable:
+    # Add a constant to constant table
     def addConstant (self, val, address):
         global constantTable
 
@@ -9,6 +10,7 @@ class ConstantTable:
         else:
             constantTable[val] = address
 
+    # Gets address of constant
     def getDir (self, val):
         global constantTable
 
@@ -17,6 +19,7 @@ class ConstantTable:
         else:
             raise NameError("Constant does not have an address")
 
+    # Search constant in constant table, if it exists returns 1, otherwise returns 0
     def searchConstant (self, val):
         global constantTable
 
@@ -25,9 +28,11 @@ class ConstantTable:
         else:
             return 0
 
+    # Returns the constant table
     def getTable(self):
         return constantTable
     
+    # Prints constant table
     def show(self):
         global constantTable
         print(constantTable)
