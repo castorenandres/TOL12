@@ -34,7 +34,8 @@ principal() {
     x = -5;
     y = -6.3;
 
-    escribir();
+    y = multi()
+    escribir()
     x = sumar(x, x + 1) + 1;
     
     from i = 0 to x + 4 do {

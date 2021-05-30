@@ -712,6 +712,7 @@ class TheOnlyLonelyParser(Parser):
                 self.generateQuad(1, self.vControl, one, self.tempiL)
                 self.generateQuad(11, self.tempiL, None, self.vControl)
                 self.tempiL = self.tempiL + 1
+                self.contTempi = self.contTempi + 1
             else:
                 raise OverflowError("Memory overflow")
         else: # Global
@@ -779,6 +780,7 @@ class TheOnlyLonelyParser(Parser):
                     self.generateQuad(31, self.tempiL, None, None)
                     self.pJumps.append(self.quadCount - 1)
                     self.tempiL = self.tempiL + 1
+                    self.contTempi = self.contTempi + 1
                 else:
                     raise OverflowError("Memory overflow")
             else: # Global
@@ -1322,7 +1324,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("fibonacciRec.txt", 'r')
+    file = open("pruebaEsp.txt", 'r')
 
     allLines = ""
     for line in file:
