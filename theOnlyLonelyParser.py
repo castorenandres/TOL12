@@ -1,3 +1,4 @@
+from typing import overload
 from sly import Parser
 from theOnlyLonelyLexer import TheOnlyLonelyLexer
 from collections import deque
@@ -215,8 +216,11 @@ class TheOnlyLonelyParser(Parser):
         # add variable to keep result of a function with return
         if self.funcTypeTemp == 1 or self.funcTypeTemp == 2:
             name = p.ID + "Value"
-            varTable.addFuncNameAsVar(name, self.funcTypeTemp, 0, self.intG, self.programName)
-            self.intG = self.intG + 1
+            if self.intG >= 1000 and self.intG < 2000:
+                varTable.addFuncNameAsVar(name, self.funcTypeTemp, 0, self.intG, self.programName)
+                self.intG = self.intG + 1
+            else:
+                raise OverflowError("Memory overflow")    
         
         functTable.addFunc(p.ID,self.funcTypeTemp)
         self.funcNames.append(self.currFuncName)
@@ -294,25 +298,36 @@ class TheOnlyLonelyParser(Parser):
         print("entra vars5")
         if p.tiposimple[1] == 'int':
             for x in range(len(self.idStack)):
-                # varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop())
                 if len(self.funcNames) > 0:
-                    varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), self.intL)
-                    self.intL = self.intL + 1
-                    self.contVari = self.contVari + 1
+                    if self.intL >= 5000 and self.intL < 6000:
+                        varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), self.intL)
+                        self.intL = self.intL + 1
+                        self.contVari = self.contVari + 1
+                    else:
+                        raise OverflowError("Memory overflow")
                 else:
-                    varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), self.intG)
-                    self.intG = self.intG + 1
-                    self.contVari = self.contVari + 1        
+                    if self.intG >= 1000 and self.intG < 2000:
+                        varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), self.intG)
+                        self.intG = self.intG + 1
+                        self.contVari = self.contVari + 1   
+                    else:
+                        raise OverflowError("Memory overflow")     
         elif p.tiposimple[1] == 'float':
             for x in range(len(self.idStack)):
                 if len(self.funcNames) > 0:
-                    varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop(), self.floatL)
-                    self.floatL = self.floatL + 1
-                    self.contVarf = self.contVarf + 1
+                    if self.floatL >= 7000 and self.floatL < 8000:
+                        varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop(), self.floatL)
+                        self.floatL = self.floatL + 1
+                        self.contVarf = self.contVarf + 1
+                    else:
+                        raise OverflowError("Memory overflow")
                 else:
-                    varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop(), self.floatG)
-                    self.floatG = self.floatG + 1
-                    self.contVarf = self.contVarf + 1
+                    if self.floatG >= 3000 and self.floatG < 4000:
+                        varTable.addVar(self.idStack.pop(), 2, self.sizeStack.pop(), self.floatG)
+                        self.floatG = self.floatG + 1
+                        self.contVarf = self.contVarf + 1
+                    else:
+                        raise OverflowError("Memory overflow")    
         return p
 
     @_('vars2', '')
@@ -352,15 +367,21 @@ class TheOnlyLonelyParser(Parser):
     def parametro3(self, p):
         print("entra parametro3")
         if self.paramTypeTemp == 1:
-            varTable.addVar(p.ID, self.paramTypeTemp, 0, self.intL)
-            functTable.setParam(self.currFuncName, [self.paramTypeTemp])
-            self.intL = self.intL + 1
-            self.contParami = self.contParami + 1
+            if self.intL >= 5000 and self.intL < 6000:
+                varTable.addVar(p.ID, self.paramTypeTemp, 0, self.intL)
+                functTable.setParam(self.currFuncName, [self.paramTypeTemp])
+                self.intL = self.intL + 1
+                self.contParami = self.contParami + 1
+            else:
+                raise OverflowError("Memory overflow")
         else:
-            varTable.addVar(p.ID, self.paramTypeTemp, 0, self.floatL)
-            functTable.setParam(self.currFuncName, [self.paramTypeTemp])
-            self.floatL = self.floatL + 1
-            self.contParamf = self.contParamf + 1
+            if self.floatL >= 7000 and self.floatL < 8000:
+                varTable.addVar(p.ID, self.paramTypeTemp, 0, self.floatL)
+                functTable.setParam(self.currFuncName, [self.paramTypeTemp])
+                self.floatL = self.floatL + 1
+                self.contParamf = self.contParamf + 1
+            else:
+                raise OverflowError("Memory overflow")
         return p
 
     @_('"," parametro', '')
@@ -437,11 +458,54 @@ class TheOnlyLonelyParser(Parser):
         self.poper.append(11)
         return p
 
-    @_('llamada2 llamada3 llamada4 llamada7 ";"')
+    @_('llamada2 llamada3 llamada4 llamada7')
     def llamada(self, p):
         print("entra llamada")
         # codes: 35 -> goSub
         self.generateQuad(35, None, None, self.tempFuncCall)
+        t_llamada = functTable.getType(self.tempFuncCall)
+        # si es int o float tiene retorno
+        if t_llamada == 1 or t_llamada == 2:
+            # variable global de la funcion
+            varFunc = self.tempFuncCall + "Value"
+            print("varFunc: ", varFunc)
+            varFuncDir = varTable.getDir(varFunc, self.programName, self.programName)
+            print("varFuncDir: ", varFuncDir)
+            t_varFunc = self.getType(varFuncDir)
+            if len(self.funcNames) > 0:
+                # es local
+                if t_varFunc == 1:
+                    if self.tempiL >= 6000 and self.tempiL < 7000:
+                            res = self.tempiL
+                            self.tempiL = self.tempiL + 1
+                            self.contTempi = self.contTempi + 1
+                    else:
+                        raise OverflowError("Memory overflow")
+                else:
+                    if self.tempfL >= 8000 and self.tempfL < 9000:
+                        res = self.tempfL
+                        self.tempfL = self.tempfL + 1
+                        self.contTempf = self.contTempf + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+            else:
+                # Guardar en temporal falta
+                if t_varFunc == 1:
+                    if self.tempiG >= 2000 and self.tempiG < 3000:
+                        res = self.tempiG
+                        self.tempiG = self.tempiG + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+                else:
+                    if self.tempfG >= 4000 and self.tempfG < 5000:
+                        res = self.tempfG
+                        self.tempfG = self.tempfG + 1
+                    else:
+                        raise OverflowError("Memort overflow")
+                
+            self.generateQuad(11, varFuncDir, None, res)
+            self.pilaO.append(res)
+            self.pTypes.append(t_varFunc)
         return p
 
     @_('ID')
@@ -456,6 +520,7 @@ class TheOnlyLonelyParser(Parser):
     @_('"("')
     def llamada3(self, p):
         print("entra llamada3")
+        self.poper.append("(")
         # codes: 33 -> ERA
         self.generateQuad(33, None, None, self.tempFuncCall)
         self.paramPointer = 0
@@ -494,6 +559,7 @@ class TheOnlyLonelyParser(Parser):
     @_('")"')
     def llamada7(self, p):
         print("entra llamada7")
+        self.poper.pop()
         if len(self.paramTypes) > 0:
             if self.paramPointer + 1 != len(self.paramTypes):
                 raise IndexError("Number of parameters mismatch")
@@ -512,7 +578,10 @@ class TheOnlyLonelyParser(Parser):
                 else:
                     raise TypeError("Type mismatch")
             else:
-                self.generateQuad(100, None, None, res)
+                if (t_res == 1 or t_res == 2):
+                    self.generateQuad(100, None, None, res)
+                else:
+                    raise TypeError("Type mismatch")
         else:
             raise TypeError("Void function does not use return")
             
@@ -538,9 +607,12 @@ class TheOnlyLonelyParser(Parser):
         if type(p[0]) == str:
             isConstant = constantTable.searchConstant(p[0])
             if isConstant == 0:
-                constantTable.addConstant(p[0], self.stringC)
-                self.generateQuad(102, None, None, self.stringC)
-                self.stringC = self.stringC + 1
+                if self.stringC >= 11000 and self.stringC < 12000:
+                    constantTable.addConstant(p[0], self.stringC)
+                    self.generateQuad(102, None, None, self.stringC)
+                    self.stringC = self.stringC + 1
+                else:
+                    raise OverflowError("Memory overflow")
             elif isConstant == 1:
                 dirC = constantTable.getDir(p[0])
                 self.generateQuad(102, None, None, dirC)
@@ -619,10 +691,13 @@ class TheOnlyLonelyParser(Parser):
         print("entra ciclof")
         isCTEI = constantTable.searchConstant("1")
         if isCTEI == 0:
-            constantTable.addConstant("1", self.intC)
-            self.pilaO.append(self.intC)
-            self.pTypes.append(1)
-            self.intC = self.intC + 1
+            if self.intC >= 9000 and self.intC < 10000:
+                constantTable.addConstant("1", self.intC)
+                self.pilaO.append(self.intC)
+                self.pTypes.append(1)
+                self.intC = self.intC + 1
+            else:
+                raise OverflowError("Memory Overflow")
         elif isCTEI == 1:
             dirC = constantTable.getDir("1")
             self.pilaO.append(dirC)
@@ -633,13 +708,19 @@ class TheOnlyLonelyParser(Parser):
         if len(self.funcNames) > 0:
             # Local
             # codes: 1 -> +
-            self.generateQuad(1, self.vControl, one, self.tempiL)
-            self.generateQuad(11, self.tempiL, None, self.vControl)
-            self.tempiL = self.tempiL + 1
+            if self.tempiL >= 6000 and self.tempiL < 7000:
+                self.generateQuad(1, self.vControl, one, self.tempiL)
+                self.generateQuad(11, self.tempiL, None, self.vControl)
+                self.tempiL = self.tempiL + 1
+            else:
+                raise OverflowError("Memory overflow")
         else: # Global
-            self.generateQuad(1, self.vControl, one, self.tempiG)
-            self.generateQuad(11, self.tempiG, None, self.vControl)
-            self.tempiG = self.tempiG + 1
+            if self.tempiG >= 2000 and self.tempiG < 3000:
+                self.generateQuad(1, self.vControl, one, self.tempiG)
+                self.generateQuad(11, self.tempiG, None, self.vControl)
+                self.tempiG = self.tempiG + 1
+            else:
+                raise OverflowError("Memory overflow")
 
         end = self.pJumps.pop()
         ret = self.pJumps.pop()
@@ -691,19 +772,25 @@ class TheOnlyLonelyParser(Parser):
             self.vFinal = self.pilaO.pop()
             # codes 8 -> <
             if len(self.funcNames) > 0:
-                self.generateQuad(8, self.vControl, self.vFinal, self.tempiL)
-                self.pJumps.append(self.quadCount - 1)
-                # codes 31 -> gotoF
-                self.generateQuad(31, self.tempiL, None, None)
-                self.pJumps.append(self.quadCount - 1)
-                self.tempiL = self.tempiL + 1
+                if self.tempiL >= 6000 and self.tempiL < 7000:
+                    self.generateQuad(8, self.vControl, self.vFinal, self.tempiL)
+                    self.pJumps.append(self.quadCount - 1)
+                    # codes 31 -> gotoF
+                    self.generateQuad(31, self.tempiL, None, None)
+                    self.pJumps.append(self.quadCount - 1)
+                    self.tempiL = self.tempiL + 1
+                else:
+                    raise OverflowError("Memory overflow")
             else: # Global
-                self.generateQuad(8, self.vControl, self.vFinal, self.tempiG)
-                self.pJumps.append(self.quadCount - 1)
-                # codes 31 -> gotoF
-                self.generateQuad(31, self.tempiG, None, None)
-                self.pJumps.append(self.quadCount - 1)
-                self.tempiG = self.tempiG + 1
+                if self.tempiG >= 2000 and self.tempiG < 3000:
+                    self.generateQuad(8, self.vControl, self.vFinal, self.tempiG)
+                    self.pJumps.append(self.quadCount - 1)
+                    # codes 31 -> gotoF
+                    self.generateQuad(31, self.tempiG, None, None)
+                    self.pJumps.append(self.quadCount - 1)
+                    self.tempiG = self.tempiG + 1
+                else:
+                    raise OverflowError("Memory overflow")
         return p
 
     @_('punto', 'linea', 'circulo', 'arco', 'penup', 'pendown', 'color', 'grosor', 'limpiar')
@@ -832,12 +919,18 @@ class TheOnlyLonelyParser(Parser):
                 if t_res != -1:
                     #agregar temporal int
                     if len(self.funcNames) > 0:
-                        res = self.tempiL
-                        self.tempiL = self.tempiL + 1
-                        self.contTempi = self.contTempi + 1
+                        if self.tempiL >= 6000 and self.tempiL < 7000:
+                            res = self.tempiL
+                            self.tempiL = self.tempiL + 1
+                            self.contTempi = self.contTempi + 1
+                        else:
+                            raise OverflowError("Memory overflow")
                     else:
-                        res = self.tempiG
-                        self.tempiG = self.tempiG + 1
+                        if self.tempiG >= 2000 and self.tempiG < 3000:
+                            res = self.tempiG
+                            self.tempiG = self.tempiG + 1
+                        else:
+                            raise OverflowError("Memory overflow")
                     
                     self.generateQuad(op, left, right, res)
                     self.pilaO.append(res)
@@ -880,12 +973,18 @@ class TheOnlyLonelyParser(Parser):
                 if t_res != -1:
                     #agregar temporal int
                     if len(self.funcNames) > 0:
-                        res = self.tempiL
-                        self.tempiL = self.tempiL + 1
-                        self.contTempi = self.contTempi + 1
+                        if self.tempiL >= 6000 and self.tempiL < 7000:
+                            res = self.tempiL
+                            self.tempiL = self.tempiL + 1
+                            self.contTempi = self.contTempi + 1
+                        else:
+                            raise OverflowError("Memory overflow")
                     else:
-                        res = self.tempiG
-                        self.tempiG = self.tempiG + 1
+                        if self.tempiG >= 2000 and self.tempiG < 3000:
+                            res = self.tempiG
+                            self.tempiG = self.tempiG + 1
+                        else:
+                            raise OverflowError("Memory overflow")
     
                     self.generateQuad(op, left, right, res)
                     self.pilaO.append(res)
@@ -928,12 +1027,18 @@ class TheOnlyLonelyParser(Parser):
                 if t_res != -1:
                     #agregar temporal int
                     if len(self.funcNames) > 0:
-                        res = self.tempiL
-                        self.tempiL = self.tempiL + 1
-                        self.contTempi = self.contTempi + 1
+                        if self.tempiL >= 6000 and self.tempiL < 7000:
+                            res = self.tempiL
+                            self.tempiL = self.tempiL + 1
+                            self.contTempi = self.contTempi + 1
+                        else:
+                            raise OverflowError("Memory overflow")
                     else:
-                        res = self.tempiG
-                        self.tempiG = self.tempiG + 1
+                        if self.tempiG >= 2000 and self.tempiG < 3000:
+                            res = self.tempiG
+                            self.tempiG = self.tempiG + 1
+                        else:
+                            raise OverflowError("Memory overflow")
 
                     self.generateQuad(op, left, right, res)
                     self.pilaO.append(res)
@@ -971,6 +1076,7 @@ class TheOnlyLonelyParser(Parser):
         print("entra expB2")
         if len(self.poper) > 0:
             top = self.poper[len(self.poper)-1]
+            print("expB2 top: ", top)
             # codes: 1 -> +, 2 -> -
             if top == 1 or top == 2:
                 right = self.pilaO.pop()
@@ -983,21 +1089,33 @@ class TheOnlyLonelyParser(Parser):
                     if t_res == 1:
                         #agregar temporal int
                         if len(self.funcNames) > 0:
-                            res = self.tempiL
-                            self.tempiL = self.tempiL + 1
-                            self.contTempi = self.contTempi + 1
+                            if self.tempiL >= 6000 and self.tempiL < 7000:
+                                res = self.tempiL
+                                self.tempiL = self.tempiL + 1
+                                self.contTempi = self.contTempi + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                         else:
-                            res = self.tempiG
-                            self.tempiG = self.tempiG + 1
+                            if self.tempiG >= 2000 and self.tempiG < 3000:
+                                res = self.tempiG
+                                self.tempiG = self.tempiG + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                     else:
                         # agregar temporal float
                         if len(self.funcNames) > 0:
-                            res = self.tempfL
-                            self.tempfL = self.tempfL + 1
-                            self.contTempf = self.contTempf + 1 
+                            if self.tempfL >= 8000 and self.tempfL < 9000:
+                                res = self.tempfL
+                                self.tempfL = self.tempfL + 1
+                                self.contTempf = self.contTempf + 1 
+                            else:
+                                raise OverflowError("Memory overflow")
                         else:
-                            res = self.tempfG
-                            self.tempfG = self.tempfG + 1
+                            if self.tempfG >= 4000 and self.tempfG < 5000:
+                                res = self.tempfG
+                                self.tempfG = self.tempfG + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                     
                     self.generateQuad(op, left, right, res)
                     self.pilaO.append(res)
@@ -1043,21 +1161,33 @@ class TheOnlyLonelyParser(Parser):
                     if t_res == 1:
                         #agregar temporal int
                         if len(self.funcNames) > 0:
-                            res = self.tempiL
-                            self.tempiL = self.tempiL + 1
-                            self.contTempi = self.contTempi + 1
+                            if self.tempiL >= 6000 and self.tempiL < 7000:
+                                res = self.tempiL
+                                self.tempiL = self.tempiL + 1
+                                self.contTempi = self.contTempi + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                         else:
-                            res = self.tempiG
-                            self.tempiG = self.tempiG + 1
+                            if self.tempiG >= 2000 and self.tempiG < 3000:
+                                res = self.tempiG
+                                self.tempiG = self.tempiG + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                     else:
                         # agregar temporal float
                         if len(self.funcNames) > 0:
-                            res = self.tempfL
-                            self.tempfL = self.tempfL + 1
-                            self.contTempf = self.contTempf + 1 
+                            if self.tempfL >= 8000 and self.tempfL < 9000:
+                                res = self.tempfL
+                                self.tempfL = self.tempfL + 1
+                                self.contTempf = self.contTempf + 1 
+                            else:
+                                raise OverflowError("Memory overflow")
                         else:
-                            res = self.tempfG
-                            self.tempfG = self.tempfG + 1
+                            if self.tempfG >= 4000 and self.tempfG < 5000:
+                                res = self.tempfG
+                                self.tempfG = self.tempfG + 1
+                            else:
+                                raise OverflowError("Memory overflow")
                     
                     self.generateQuad(op, left, right, res)
                     self.pilaO.append(res)
@@ -1140,10 +1270,13 @@ class TheOnlyLonelyParser(Parser):
         sNumber = str(number)
         isCTEI = constantTable.searchConstant(sNumber)
         if isCTEI == 0:
-            constantTable.addConstant(sNumber, self.intC)
-            self.pilaO.append(self.intC)
-            self.pTypes.append(1)
-            self.intC = self.intC + 1
+            if self.intC >= 9000 and self.intC < 10000:
+                constantTable.addConstant(sNumber, self.intC)
+                self.pilaO.append(self.intC)
+                self.pTypes.append(1)
+                self.intC = self.intC + 1
+            else:
+                raise OverflowError("Memory overflow")
         elif isCTEI == 1:
             dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
@@ -1158,10 +1291,13 @@ class TheOnlyLonelyParser(Parser):
         sNumber = str(number)
         isCTEF = constantTable.searchConstant(sNumber)
         if isCTEF == 0:
-            constantTable.addConstant(sNumber, self.floatC)
-            self.pilaO.append(self.floatC)
-            self.pTypes.append(2)
-            self.floatC = self.floatC + 1
+            if self.floatC >= 10000 and self.floatC < 11000:
+                constantTable.addConstant(sNumber, self.floatC)
+                self.pilaO.append(self.floatC)
+                self.pTypes.append(2)
+                self.floatC = self.floatC + 1
+            else:
+                raise OverflowError("Memory overflow")
         elif isCTEF == 1:
             dirC = constantTable.getDir(sNumber)
             self.pilaO.append(dirC)
@@ -1186,7 +1322,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("pruebaVM.txt", 'r')
+    file = open("fibonacciRec.txt", 'r')
 
     allLines = ""
     for line in file:
@@ -1203,6 +1339,10 @@ if __name__ == '__main__':
     print(result)
 
     file.close()
+
+    # print(functTable.show())
+    print(constantTable.show())
+    print(parser.quadruples)
 
     # pass tables to virtual machine
     vm = VirtualMachine()

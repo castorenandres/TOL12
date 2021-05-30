@@ -66,8 +66,8 @@ Octavo avance:
     Crear metodos que regresen las tablas
     Diseñar la memoria y sus metodos
     Implementar memoria
-
-    Haciendo:
     Empezar la maquina virtual
 
+    Haciendo:
+    Recursividad
     Pendiente:

@@ -35,7 +35,7 @@ principal() {
     y = -6.3;
 
     escribir();
-    sumar(x, x + 1);
+    x = sumar(x, x + 1) + 1;
     
     from i = 0 to x + 4 do {
         pendown();
