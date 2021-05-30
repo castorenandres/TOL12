@@ -139,6 +139,7 @@ class TheOnlyLonelyParser(Parser):
         }
     }
     
+    # Returns the type or a -1 if it the pair of types with the operators is not allowed.
     def semantics (self, t_left, t_right, op):
         return self.semCube[t_left][t_right][op]
 
@@ -152,7 +153,7 @@ class TheOnlyLonelyParser(Parser):
         }
         self.quadruples[self.quadCount-1] = tempQuad
 
-    # get type by memory address
+    # Get type by memory address
     def getType (self, dir):
         if dir >= 7000 and dir < 9000:
             return 2
@@ -165,6 +166,7 @@ class TheOnlyLonelyParser(Parser):
         else:
             raise TypeError("Type does not exists for address")
 
+    # Fills a quadruple with the address to jump to 
     def fillQuadruple (self, toFill, fillWith):
         if toFill in self.quadruples:
             self.quadruples[toFill]["res"] = fillWith
@@ -225,6 +227,7 @@ class TheOnlyLonelyParser(Parser):
         functTable.addFunc(p.ID,self.funcTypeTemp)
         self.funcNames.append(self.currFuncName)
         self.currFuncName = p.ID
+        # Counters to get the size of a function
         self.contParami = 0
         self.contParamf = 0
         self.contVari = 0
@@ -298,7 +301,7 @@ class TheOnlyLonelyParser(Parser):
         print("entra vars5")
         if p.tiposimple[1] == 'int':
             for x in range(len(self.idStack)):
-                if len(self.funcNames) > 0:
+                if len(self.funcNames) > 0: # check if it is local
                     if self.intL >= 5000 and self.intL < 6000:
                         varTable.addVar(self.idStack.pop(), 1, self.sizeStack.pop(), self.intL)
                         self.intL = self.intL + 1
@@ -435,7 +438,7 @@ class TheOnlyLonelyParser(Parser):
                 if t_asign != -1:
                     self.generateQuad(op, res, None, left)
                 else:
-                    raise TypeError("type mismatch")
+                    raise TypeError("Type mismatch")
         else:
             raise ValueError("No more operands to use")
         return p
@@ -468,9 +471,7 @@ class TheOnlyLonelyParser(Parser):
         if t_llamada == 1 or t_llamada == 2:
             # variable global de la funcion
             varFunc = self.tempFuncCall + "Value"
-            print("varFunc: ", varFunc)
             varFuncDir = varTable.getDir(varFunc, self.programName, self.programName)
-            print("varFuncDir: ", varFuncDir)
             t_varFunc = self.getType(varFuncDir)
             if len(self.funcNames) > 0:
                 # es local
@@ -487,7 +488,7 @@ class TheOnlyLonelyParser(Parser):
                         self.tempfL = self.tempfL + 1
                         self.contTempf = self.contTempf + 1
                     else:
-                        raise OverflowError("Memort overflow")
+                        raise OverflowError("Memory overflow")
             else:
                 # Guardar en temporal falta
                 if t_varFunc == 1:
@@ -495,13 +496,13 @@ class TheOnlyLonelyParser(Parser):
                         res = self.tempiG
                         self.tempiG = self.tempiG + 1
                     else:
-                        raise OverflowError("Memort overflow")
+                        raise OverflowError("Memory overflow")
                 else:
                     if self.tempfG >= 4000 and self.tempfG < 5000:
                         res = self.tempfG
                         self.tempfG = self.tempfG + 1
                     else:
-                        raise OverflowError("Memort overflow")
+                        raise OverflowError("Memory overflow")
                 
             self.generateQuad(11, varFuncDir, None, res)
             self.pilaO.append(res)
@@ -634,7 +635,7 @@ class TheOnlyLonelyParser(Parser):
         print("entra condicion2")
         t_exp = self.pTypes.pop()
         if t_exp != 1:
-            raise TypeError("type mismatch")
+            raise TypeError("Type mismatch")
         else:
             res = self.pilaO.pop()
             # codes: 31 -> gotoF
@@ -1078,7 +1079,6 @@ class TheOnlyLonelyParser(Parser):
         print("entra expB2")
         if len(self.poper) > 0:
             top = self.poper[len(self.poper)-1]
-            print("expB2 top: ", top)
             # codes: 1 -> +, 2 -> -
             if top == 1 or top == 2:
                 right = self.pilaO.pop()
@@ -1196,9 +1196,6 @@ class TheOnlyLonelyParser(Parser):
                     self.pTypes.append(t_res)
                 else:
                     raise TypeError("type mismatch")
-        else:
-            print("poper vacio")
-            
         return p
 
     @_('termino4 termino', '')
@@ -1343,8 +1340,8 @@ if __name__ == '__main__':
     file.close()
 
     # print(functTable.show())
-    print(constantTable.show())
-    print(parser.quadruples)
+    # print(constantTable.show())
+    # print(parser.quadruples)
 
     # pass tables to virtual machine
     vm = VirtualMachine()

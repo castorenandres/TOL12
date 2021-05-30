@@ -16,6 +16,7 @@ class VirtualMachine:
     prevMemoryL = []
     funcName = ''
     prevFunc = deque()
+
     # quadruples parts
     op = 0
     right = 0
@@ -72,6 +73,7 @@ class VirtualMachine:
         if name in self.funcTable:
             return self.funcTable[name]["dir"]
 
+    # Returns the global variable 
     def getGlobalVariableDir(self, name):
         programName = self.getProgramsName()
         if name in self.funcTable[programName]["varT"]:
@@ -565,7 +567,6 @@ class VirtualMachine:
                     result = self.memoryG.getValue(self.left)
                 
                 memoryL.setParam(result)
-                # memoryL.show()
             elif self.op == 35: # GOSUB
                 funcDir = self.getFuncDir(self.res)
                 self.prevInstruction.append(self.instruction)
@@ -595,11 +596,5 @@ class VirtualMachine:
                 retVariableDir = self.getGlobalVariableDir(retVariable)
                 self.memoryG.updateMemory(retVariableDir, result)
                 
-
-
-            # print(self.instruction)
             self.instruction = self.instruction + 1
         turtle.done()
-        print('\n')
-        self.memoryG.show()
-        # print(quadruples)

@@ -4,6 +4,7 @@ funcTable = {}
 varTable = {}
 
 class FuncTable():
+  # Add function to function table
   def addFunc (self, name, returnType):
     global funcTable
     global currentFunc
@@ -23,8 +24,9 @@ class FuncTable():
       funcTable[name] = tempDict
       currentFunc = name
     else:
-      raise NameError("function name already exists")
+      raise NameError("Function name already exists")
 
+  # Sets the size of the functions
   def setFuncSize (self, name, parami, paramf, vari, varf, tempi, tempf):
     global funcTable
 
@@ -39,8 +41,9 @@ class FuncTable():
       }
       funcTable[name]["size"] = funcSize
     else:
-      raise NameError("function does not exists")
+      raise NameError("Function does not exists")
 
+  # Sets the parameters type used in a function
   def setParam (self, name, param):
     global funcTable
 
@@ -49,6 +52,7 @@ class FuncTable():
     else:
       raise NameError("Function does not exists")
 
+  # Gets the parameters type used in a function
   def getParam (self, name):
     global funcTable
 
@@ -57,6 +61,7 @@ class FuncTable():
     else:
       raise NameError("Function does not exists")
 
+  # Gets the type of a function
   def getType (self, name):
     global funcTable
 
@@ -65,6 +70,7 @@ class FuncTable():
     else:
       raise NameError("Function does not exists")
 
+  # Sets the address that defines the start of the function
   def setDir (self, name, address):
     global funcTable
 
@@ -73,6 +79,7 @@ class FuncTable():
     else:
       raise NameError("Function does not exists")
 
+  # Searchs a function in the function table, if it exists it returns a 1, otherwise an error is raised
   def searchFunc (self, name):
     global funcTable
 
@@ -81,6 +88,7 @@ class FuncTable():
     else:
       raise NameError("Function does not exists")
 
+  # Deletes the variable table of a function
   def delVarT (self, name):
     global funcTable
 
@@ -89,14 +97,17 @@ class FuncTable():
     else:
       raise NameError("Function name does not exists")
 
+  # Returns function table
   def getTable (self):
     return funcTable
 
+  # Prints function table
   def show(self):
     print(funcTable)
 
 
 class VarTable():
+  # Add a variable to the variable table
   def addVar (self, name, varType, size, address):
     global varTable
     global funcTable
@@ -122,6 +133,7 @@ class VarTable():
     else:
       raise NameError("variable name already exists")
 
+  # Add the function name + 'Value' as a variable to the global variables table
   def addFuncNameAsVar (self, name, varType, size, address, globalFunc):
     global varTable
     global funcTable
@@ -147,6 +159,7 @@ class VarTable():
     else:
       raise NameError("variable name already exists")
 
+  # Gets address of variable
   def getDir (self, id, funcName, globalFunc):
     global funcTable
 
@@ -157,15 +170,17 @@ class VarTable():
 
     raise NameError("variable does not exists") 
 
+  # Search in variable table for a variable, if it exists returns 1, otherwise an error is raised
   def searchVar (self, id, funcName, globalFunc):
     global funcTable
     
     if id in funcTable[funcName]["varT"]:
       return 1
-    elif id in funcTable[globalFunc]["varT"]:
+    elif id in funcTable[globalFunc]["varT"]: # Search in global variable table
       return 1
     else:
       raise NameError("variable does not exists")
 
+  # Prints variable table
   def show(self):
     print(varTable)
