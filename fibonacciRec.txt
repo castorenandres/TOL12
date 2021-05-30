@@ -21,6 +21,6 @@ int function fibonacci (int n);
 }
 
 principal() {
-    fibo = fibonacci(20);
+    fibo = fibonacci(10);
     write(fibo);
 }

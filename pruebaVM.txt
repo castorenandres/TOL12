@@ -5,8 +5,15 @@ variables
 
 void function escribir ();
 {
-    arc(50, 180);
     write("Hola mundo!");
+}
+
+void function dibujar ();
+{
+    from i = 0 to 10 do {
+        line(i * 10, vertical);
+        arc(i * 10, 180);
+    }
 }
 
 float function sumar (int x, float y);
@@ -21,4 +28,5 @@ principal() {
 
     resultado = (sumar(x, y) + 5) * 2;
     write(resultado);
+    dibujar()
 }
