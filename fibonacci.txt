@@ -1,0 +1,35 @@
+program fibonacci;
+variables
+    num, term1, term2, term3, cont : int;
+
+principal() {
+    write("Cuantos terminos? \n");
+    read(num);
+
+    term1 = 0;
+    term2 = 1;
+    term3 = 0;
+    cont = 0;
+
+    if (num < 0) then {
+        write("No existe");
+    } else {
+        if (num == 0) then {
+            write(term1);
+        } else {
+            if (num == 1 | num == 2) then {
+                write(term2);
+            } else {
+                while (cont < num - 1) do {
+                    term3 = term1 + term2;
+                    term1 = term2;
+                    term2 = term3;
+                    cont = cont + 1;
+                }
+                write("El resultado es: \n");
+                write(term2);
+            }
+        }
+    }
+
+}
