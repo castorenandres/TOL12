@@ -671,7 +671,7 @@ class TheOnlyLonelyParser(Parser):
     @_('WHILE')
     def ciclow2(self, p):
         print("entra ciclow2")
-        self.pJumps.append(self.quadCount - 1)
+        self.pJumps.append(self.quadCount)
         return p
 
     @_('"(" expresion ")"')
@@ -1321,7 +1321,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("pruebaEsp.txt", 'r')
+    file = open("fibonacci.txt", 'r')
 
     allLines = ""
     for line in file:
