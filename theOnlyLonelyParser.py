@@ -1321,7 +1321,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("fibonacci.txt", 'r')
+    file = open("drawPrincipal.txt", 'r')
 
     allLines = ""
     for line in file:
