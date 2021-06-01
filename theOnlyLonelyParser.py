@@ -1321,7 +1321,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("drawPrincipal.txt", 'r')
+    file = open("drawFunction.txt", 'r')
 
     allLines = ""
     for line in file:
