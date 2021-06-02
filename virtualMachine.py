@@ -4,7 +4,6 @@ from collections import deque
 from typing import Type
 from MemoryVM import GlobalMemory
 from MemoryVM import LocalMemory
-from copy import deepcopy
 
 class VirtualMachine:
     memoryG = GlobalMemory()
@@ -93,6 +92,7 @@ class VirtualMachine:
         # print(quadruples, '\n')
         # self.memoryG.show()
 
+        # loop to go through all quadruples
         while self.instruction < len(quadruples):
             self.op, self.left, self.right, self.res = self.breakQuadrupleParts(quadruples, self.instruction)
 
@@ -409,7 +409,7 @@ class VirtualMachine:
             
             # Pre-define functions
             # read and write
-            elif self.op == 101:
+            elif self.op == 101: # read
                 result = input()
 
                 if "." in result:
@@ -435,7 +435,7 @@ class VirtualMachine:
                         self.memoryG.updateMemory(self.res, result)
                     else:
                         raise TypeError("Input and variable type do not match")
-            elif self.op == 102:
+            elif self.op == 102: # write
                 if self.res >= 11000 and self.res < 12000:
                     result = self.memoryG.getValue(self.res)
                     result = result.replace('"', '')
@@ -446,7 +446,7 @@ class VirtualMachine:
                     print(result)
             
             # Turtle graphics functions
-            elif self.op == 103:
+            elif self.op == 103: # point
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     x = memoryL.getLocalValue(self.left)
@@ -459,7 +459,7 @@ class VirtualMachine:
                     y = self.memoryG.getValue(self.right)
                 
                 self.trt.setpos(x, y)
-            elif self.op == 104:
+            elif self.op == 104: # circle
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     radius = memoryL.getLocalValue(self.left)
@@ -467,7 +467,7 @@ class VirtualMachine:
                     radius = self.memoryG.getValue(self.left)
 
                 self.trt.circle(radius)
-            elif self.op == 105:
+            elif self.op == 105: # line
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     distance = memoryL.getLocalValue(self.left)
@@ -478,7 +478,7 @@ class VirtualMachine:
                     self.trt.sety(distance)
                 else:
                     self.trt.setx(distance)
-            elif self.op == 106:
+            elif self.op == 106: # arc
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     radius = memoryL.getLocalValue(self.left)
@@ -491,11 +491,11 @@ class VirtualMachine:
                     angle = self.memoryG.getValue(self.right)
                 
                 self.trt.circle(radius, angle)
-            elif self.op == 107:
+            elif self.op == 107: # penup
                 self.trt.penup()
-            elif self.op == 108:
+            elif self.op == 108: # pendown
                 self.trt.pendown()
-            elif self.op == 109:
+            elif self.op == 109: # color
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     red = memoryL.getLocalValue(self.left)
@@ -514,7 +514,7 @@ class VirtualMachine:
                 
                 self.trt.screen.colormode(255)
                 self.trt.pencolor(red, green, blue)
-            elif self.op == 110:
+            elif self.op == 110: # width
                 if self.left >= 5000 and self.left < 9000:
                     # local variable
                     width = memoryL.getLocalValue(self.left)
@@ -522,20 +522,20 @@ class VirtualMachine:
                     width = self.memoryG.getValue(self.left)
                 
                 self.trt.width(width)
-            elif self.op == 111:
+            elif self.op == 111: # clear
                 self.trt.clear()
 
             # conditionals and loops
-            elif self.op == 30:
+            elif self.op == 30: # goto
                 self.instruction = self.res - 1
-            elif self.op == 31:
+            elif self.op == 31: # gotoF
                 if self.left >= 5000 and self.left < 9000:
                     if memoryL.getLocalValue(self.left) == 0:
                         self.instruction = self.res - 1
                 else:
                     if self.memoryG.getValue(self.left) == 0:
                         self.instruction = self.res - 1
-            elif self.op == 32:
+            elif self.op == 32: # gotoV
                 if self.left >= 5000 and self.left < 9000:
                     if memoryL.getLocalValue(self.left) == 1:
                         self.instruction = self.res - 1
