@@ -22,6 +22,6 @@ int function factorial (int n);
 }
 
 principal() {
-    fact = factorial(6);
+    fact = factorial(8);
     write(fact);
 }

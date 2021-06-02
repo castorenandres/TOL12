@@ -143,6 +143,7 @@ class TheOnlyLonelyParser(Parser):
     def semantics (self, t_left, t_right, op):
         return self.semCube[t_left][t_right][op]
 
+    # Creates and adds a quadruple.
     def generateQuad (self, op, left, right, res):
         self.quadCount = self.quadCount + 1
         tempQuad = {
@@ -153,7 +154,7 @@ class TheOnlyLonelyParser(Parser):
         }
         self.quadruples[self.quadCount-1] = tempQuad
 
-    # Get type by memory address
+    # Get type by memory address.
     def getType (self, dir):
         if dir >= 7000 and dir < 9000:
             return 2
@@ -166,7 +167,7 @@ class TheOnlyLonelyParser(Parser):
         else:
             raise TypeError("Type does not exists for address")
 
-    # Fills a quadruple with the address to jump to 
+    # Fills a quadruple with the address to jump to.
     def fillQuadruple (self, toFill, fillWith):
         if toFill in self.quadruples:
             self.quadruples[toFill]["res"] = fillWith
@@ -192,6 +193,7 @@ class TheOnlyLonelyParser(Parser):
     @_('ID')
     def programa4(self, p):
         print("entra programa4")
+        # add programs name to function table
         functTable.addFunc(p.ID, 3)
         self.programName = p.ID
         self.currFuncName = p.ID
@@ -238,6 +240,7 @@ class TheOnlyLonelyParser(Parser):
     @_('bloque')
     def func6(self, p):
         print("entra func6")
+        # deletes function's variable Table
         functTable.delVarT(self.currFuncName)
         # codes: 36 -> EndFunc
         self.generateQuad(36, None, None, None)
@@ -261,7 +264,7 @@ class TheOnlyLonelyParser(Parser):
     @_('vars', '')
     def func3(self, p):
         print("entra func3")
-        # meter direccion inicial de la funcion
+        # set initial address of function
         functTable.setDir(self.currFuncName, self.quadCount)
         return p
 
@@ -1321,7 +1324,7 @@ class TheOnlyLonelyParser(Parser):
 
 # main
 if __name__ == '__main__':
-    file = open("drawPrincipal.txt", 'r')
+    file = open("factorial.txt", 'r')
 
     allLines = ""
     for line in file:

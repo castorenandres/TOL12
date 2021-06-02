@@ -11,6 +11,7 @@ class GlobalMemory:
         "stringC": {}
     }
 
+    # set constant to global memory
     def setConstants(self, address, value):
         if address < 12000 and address >= 9000:
             if address >= 11000:
@@ -22,6 +23,7 @@ class GlobalMemory:
         else:
             raise ValueError("Address is not a constant")
 
+    # set global variable to global memory
     def setGlobalVariables(self, address):
         if address >= 3000 and address < 4000:
             self.globalMemory["float"][address] = None
@@ -30,6 +32,7 @@ class GlobalMemory:
         else:
             raise ValueError("Address is not a global variable")
 
+    # set temporary variables to global memory
     def setTempVariables(self, address, value):
         if address >= 4000 and address < 5000:
             self.globalMemory["tempf"][address] = value
@@ -38,6 +41,7 @@ class GlobalMemory:
         else:
             raise ValueError("Address is not a temporal variable")
 
+    # get type of variable
     def getType(self, address):
         if address < 12000 and address >= 1000:
             if address >= 11000:
@@ -59,6 +63,7 @@ class GlobalMemory:
         else:
             raise ValueError("Address not found")
 
+    # update variable's value
     def updateMemory(self, address, value):
         typeAddress = self.getType(address)
         if address in self.globalMemory[typeAddress]:
@@ -66,6 +71,7 @@ class GlobalMemory:
         else:
             raise IndexError("Address does not exists")
         
+    # get value of variable
     def getValue(self, address):
         typeAddress = self.getType(address)
         
@@ -77,17 +83,20 @@ class GlobalMemory:
         else:
             raise IndexError("Address does not exists")
 
+    # Checks if a variable exists in global memory
     def isDir(self, address):
         for key in self.globalMemory:
             if address in self.globalMemory[key]:
                 return 1
         return 0
 
+    # prints global memory
     def show(self):
         print(self.globalMemory)
 
 class LocalMemory:
-
+    # Constructor
+    # Adds the necessary register/space for the local memory
     def __init__(self, parami, paramf, vari, varf, tempi, tempf):
         self.intL = 5000
         self.tempiL = 6000
@@ -136,6 +145,7 @@ class LocalMemory:
                 self.localMemory["tempf"][self.tempfL] = None
                 self.tempfL = self.tempfL + 1
 
+    # set parameter value to local memory
     def setParam(self, value):
         if len(self.params) > 0:
             paramAddress = self.params.popleft()
@@ -144,6 +154,7 @@ class LocalMemory:
         else:
             raise IndexError("Parameter does not exists")
 
+    # get type of variable
     def getType(self, address):
         if address < 9000 or address >= 5000:
             if address >= 8000:
@@ -157,6 +168,7 @@ class LocalMemory:
         else:
             raise ValueError("Address not found")
 
+    # updates value of local variables
     def updateLocalMemory(self, address, value):
         typeAddress = self.getType(address)
         if address in self.localMemory[typeAddress]:
@@ -164,6 +176,7 @@ class LocalMemory:
         else:
             raise IndexError("Local address does not exists")
 
+    # gets local variable value
     def getLocalValue(self, address):
         typeAddress = self.getType(address)
         
@@ -178,5 +191,6 @@ class LocalMemory:
         else:
             raise IndexError("Address does not exists")
 
+    # prints local memory
     def show(self):
         print(self.localMemory)
